@@ -21,17 +21,17 @@ class Lexer {
         var tok: Token!
         readChar()
         switch ch {
-            case "=": tok = Token(tokenType: TokenType.ASSIGN, literal: ch)
-            case ";": tok = Token(tokenType: TokenType.SEMICOLON, literal: ch)
-            case "(": tok = Token(tokenType: TokenType.LPAREN, literal: ch)
-            case ")": tok = Token(tokenType: TokenType.RPAREN, literal: ch)
-            case ",": tok = Token(tokenType: TokenType.COMMA, literal: ch)
-            case "+": tok = Token(tokenType: TokenType.PLUS, literal: ch)
-            case "{": tok = Token(tokenType: TokenType.LBRACE, literal: ch)
-            case "}": tok = Token(tokenType: TokenType.RBRACE, literal: ch)
-            case "0": tok = Token(tokenType: TokenType.EOF, literal: ch)
+            case "=": tok = Token(tokenType: TokenType.ASSIGN, literal: String(ch))
+            case ";": tok = Token(tokenType: TokenType.SEMICOLON, literal: String(ch))
+            case "(": tok = Token(tokenType: TokenType.LPAREN, literal: String(ch))
+            case ")": tok = Token(tokenType: TokenType.RPAREN, literal: String(ch))
+            case ",": tok = Token(tokenType: TokenType.COMMA, literal: String(ch))
+            case "+": tok = Token(tokenType: TokenType.PLUS, literal: String(ch))
+            case "{": tok = Token(tokenType: TokenType.LBRACE, literal: String(ch))
+            case "}": tok = Token(tokenType: TokenType.RBRACE, literal: String(ch))
+            case "0": tok = Token(tokenType: TokenType.EOF, literal: String(ch))
             default:
-                tok = Token(tokenType: TokenType.ILLEGAL, literal: ch)
+                tok = Token(tokenType: TokenType.ILLEGAL, literal: String(ch))
         }
         return tok
     }

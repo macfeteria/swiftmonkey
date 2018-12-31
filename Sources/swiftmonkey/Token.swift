@@ -27,5 +27,5 @@ enum TokenType:String {
 
 struct Token {
     var tokenType:TokenType
-    var literal:Character
+    var literal:String
 }
