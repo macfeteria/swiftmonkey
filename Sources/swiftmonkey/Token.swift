@@ -1,5 +1,5 @@
 
-enum TokenType:String {
+public enum TokenType:String {
     case ILLEGAL = "ILLEGAL"
     case EOF     = "EOF"
     
@@ -25,7 +25,18 @@ enum TokenType:String {
     case LET      = "LET"
 }
 
-struct Token {
+public struct Token {
     var tokenType:TokenType
     var literal:String
+}
+
+let keywords = [ "fn": TokenType.FUNCTION,
+                 "let" : TokenType.LET]
+
+func lookupIdent(ident:String) -> TokenType {
+    if let key = keywords[ident] {
+        return key
+    } else {
+        return TokenType.IDENT
+    }
 }

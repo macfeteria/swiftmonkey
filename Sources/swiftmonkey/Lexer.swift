@@ -7,19 +7,32 @@
 
 import Foundation
 
-class Lexer {
+public class Lexer {
     var input:String = ""
     var position:Int = 0
     var readPosition:Int = 0
     var ch:Character = "\0"
     
-    init (input:String) {
+    public init (input:String) {
         self.input = input
+        if input.count > 0 {
+            readChar()
+        }
     }
     
-    func nextToken() -> Token {
+    func isLetter(char: Character) -> Bool {
+        return Character("a") <= char && char <= Character("z") ||
+               Character("A") <= char && char <= Character("Z") ||
+               Character("_") == char
+    }
+    
+    func isDigit(char: Character) -> Bool {
+        return Character("0") <= char && char <= Character("9")
+    }
+    
+    public func nextToken() -> Token {
         var tok: Token!
-        readChar()
+        skipWhitespace()
         switch ch {
             case "=": tok = Token(tokenType: TokenType.ASSIGN, literal: String(ch))
             case ";": tok = Token(tokenType: TokenType.SEMICOLON, literal: String(ch))
@@ -29,11 +42,47 @@ class Lexer {
             case "+": tok = Token(tokenType: TokenType.PLUS, literal: String(ch))
             case "{": tok = Token(tokenType: TokenType.LBRACE, literal: String(ch))
             case "}": tok = Token(tokenType: TokenType.RBRACE, literal: String(ch))
-            case "0": tok = Token(tokenType: TokenType.EOF, literal: String(ch))
+            case "\0": tok = Token(tokenType: TokenType.EOF, literal: String(ch))
             default:
-                tok = Token(tokenType: TokenType.ILLEGAL, literal: String(ch))
+                if isLetter(char:ch) {
+                    let lit = readIdentifier()
+                    let type = lookupIdent(ident: lit)
+                    return Token(tokenType: type, literal: lit)
+                } else if isDigit(char:ch) {
+                    let lit = readNumber()
+                    return Token(tokenType: TokenType.INT, literal: lit)
+                } else {
+                    return Token(tokenType: TokenType.ILLEGAL, literal: String(ch))
+                }
         }
+        readChar()
         return tok
+    }
+    
+    func readIdentifier() -> String {
+        var iden = ""
+        while (isLetter(char: ch)) {
+            iden.append(ch)
+            readChar()
+        }
+        return iden
+    }
+    
+    
+    func readNumber() -> String {
+        var num = ""
+        while isDigit(char: ch) {
+            num.append(ch)
+            readChar()
+        }
+        return num
+    }
+
+    func skipWhitespace() {
+        while ((ch == " ") || (ch == "\n") ||
+               (ch == "\t") || (ch == "\r")){
+            readChar()
+        }
     }
     
     @discardableResult
@@ -48,5 +97,4 @@ class Lexer {
         readPosition += 1
         return ch
     }
-    
 }

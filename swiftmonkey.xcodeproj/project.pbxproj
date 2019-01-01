@@ -28,7 +28,6 @@
 		OBJ_34 /* swiftmonkey.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "swiftmonkey::swiftmonkey::Product" /* swiftmonkey.framework */; };
 		OBJ_41 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_6 /* Package.swift */; };
 		OBJ_52 /* XCTestManifests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_14 /* XCTestManifests.swift */; };
-		OBJ_53 /* swiftmonkeyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_15 /* swiftmonkeyTests.swift */; };
 		OBJ_55 /* swiftmonkey.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "swiftmonkey::swiftmonkey::Product" /* swiftmonkey.framework */; };
 /* End PBXBuildFile section */
 
@@ -61,7 +60,6 @@
 		D7B356C421D920B100DC0CB2 /* LexerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexerTests.swift; sourceTree = "<group>"; };
 		OBJ_11 /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		OBJ_14 /* XCTestManifests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTestManifests.swift; sourceTree = "<group>"; };
-		OBJ_15 /* swiftmonkeyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = swiftmonkeyTests.swift; sourceTree = "<group>"; };
 		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		OBJ_9 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		"swiftmonkey::swiftmonkey::Product" /* swiftmonkey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = swiftmonkey.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -118,7 +116,6 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_14 /* XCTestManifests.swift */,
-				OBJ_15 /* swiftmonkeyTests.swift */,
 				D7B356C421D920B100DC0CB2 /* LexerTests.swift */,
 			);
 			name = swiftmonkeyTests;
@@ -135,7 +132,7 @@
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -143,7 +140,6 @@
 				OBJ_12 /* Tests */,
 				OBJ_16 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_7 /* Sources */ = {
@@ -246,7 +242,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_16 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -292,7 +288,6 @@
 			files = (
 				OBJ_52 /* XCTestManifests.swift in Sources */,
 				D7B356C521D920B100DC0CB2 /* LexerTests.swift in Sources */,
-				OBJ_53 /* swiftmonkeyTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
