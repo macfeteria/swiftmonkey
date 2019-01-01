@@ -10,7 +10,14 @@ public enum TokenType:String {
     // Operator
     case ASSIGN = "="
     case PLUS   = "+"
+    case MINUS  = "-"
+    case BANG   = "!"
+    case ASTERISK  = "*"
+    case SLASH = "/"
     
+    case GREATER = ">"
+    case LESSTHAN = "<"
+
     // Delimiters
     case COMMA     = ","
     case SEMICOLON = ";"

@@ -109,4 +109,34 @@ class LexerTests: XCTestCase {
             XCTAssert(tok.literal == i.literal, "Failed Literal: \(tok.literal)")
         }
     }
+    
+    func testExtendOperator() {
+        let code = """
+            !-/*5;
+            5 < 10 > 5;
+            """
+        let expectResult = [
+            Token(tokenType: TokenType.BANG, literal: "!"),
+            Token(tokenType: TokenType.MINUS, literal: "-"),
+            Token(tokenType: TokenType.SLASH, literal: "/"),
+            Token(tokenType: TokenType.ASTERISK, literal: "*"),
+            Token(tokenType: TokenType.INT, literal: "5"),
+            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
+
+            Token(tokenType: TokenType.INT, literal: "5"),
+            Token(tokenType: TokenType.LESSTHAN, literal: "<"),
+            Token(tokenType: TokenType.INT, literal: "10"),
+            Token(tokenType: TokenType.GREATER, literal: ">"),
+            Token(tokenType: TokenType.INT, literal: "5"),
+            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
+            ]
+        
+        let lexer = Lexer(input: code)
+        for i in expectResult {
+            let tok = lexer.nextToken()
+            XCTAssert(tok.tokenType == i.tokenType, "Failed Type: \(tok.tokenType.rawValue )")
+            XCTAssert(tok.literal == i.literal, "Failed Literal: \(tok.literal)")
+        }
+    }
+
 }

@@ -39,7 +39,15 @@ public class Lexer {
             case "(": tok = Token(tokenType: TokenType.LPAREN, literal: String(ch))
             case ")": tok = Token(tokenType: TokenType.RPAREN, literal: String(ch))
             case ",": tok = Token(tokenType: TokenType.COMMA, literal: String(ch))
+
             case "+": tok = Token(tokenType: TokenType.PLUS, literal: String(ch))
+            case "-": tok = Token(tokenType: TokenType.MINUS, literal: String(ch))
+            case "/": tok = Token(tokenType: TokenType.SLASH, literal: String(ch))
+            case "*": tok = Token(tokenType: TokenType.ASTERISK, literal: String(ch))
+            case "!": tok = Token(tokenType: TokenType.BANG, literal: String(ch))
+            case "<": tok = Token(tokenType: TokenType.LESSTHAN, literal: String(ch))
+            case ">": tok = Token(tokenType: TokenType.GREATER, literal: String(ch))
+
             case "{": tok = Token(tokenType: TokenType.LBRACE, literal: String(ch))
             case "}": tok = Token(tokenType: TokenType.RBRACE, literal: String(ch))
             case "\0": tok = Token(tokenType: TokenType.EOF, literal: String(ch))
