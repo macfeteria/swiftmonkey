@@ -139,4 +139,40 @@ class LexerTests: XCTestCase {
         }
     }
 
+    func testTrueFalseIfElse() {
+        let code = """
+            if (5 < 10) {
+                return true;
+            } else {
+                return false;
+            }
+            """
+        let expectResult = [
+            Token(tokenType: TokenType.IF, literal: "if"),
+            Token(tokenType: TokenType.LPAREN, literal: "("),
+            Token(tokenType: TokenType.INT, literal: "5"),
+            Token(tokenType: TokenType.LESSTHAN, literal: "<"),
+            Token(tokenType: TokenType.INT, literal: "10"),
+            Token(tokenType: TokenType.RPAREN, literal: ")"),
+            Token(tokenType: TokenType.LBRACE, literal: "{"),
+            Token(tokenType: TokenType.RETURN, literal: "return"),
+            Token(tokenType: TokenType.TRUE, literal: "true"),
+            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
+            Token(tokenType: TokenType.RBRACE, literal: "}"),
+            Token(tokenType: TokenType.ELSE, literal: "else"),
+            Token(tokenType: TokenType.LBRACE, literal: "{"),
+            Token(tokenType: TokenType.RETURN, literal: "return"),
+            Token(tokenType: TokenType.FALSE, literal: "false"),
+            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
+            Token(tokenType: TokenType.RBRACE, literal: "}"),
+            ]
+        
+        let lexer = Lexer(input: code)
+        for i in expectResult {
+            let tok = lexer.nextToken()
+            XCTAssert(tok.tokenType == i.tokenType, "Failed Type: \(tok.tokenType.rawValue )")
+            XCTAssert(tok.literal == i.literal, "Failed Literal: \(tok.literal)")
+        }
+    }
+
 }

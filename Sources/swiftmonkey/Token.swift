@@ -30,6 +30,11 @@ public enum TokenType:String {
     // Keywords
     case FUNCTION = "FUNCTION"
     case LET      = "LET"
+    case TRUE     = "TRUE"
+    case FALSE    = "FALSE"
+    case IF       = "IF"
+    case ELSE     = "ELSE"
+    case RETURN   = "RETURN"
 }
 
 public struct Token {
@@ -38,7 +43,13 @@ public struct Token {
 }
 
 let keywords = [ "fn": TokenType.FUNCTION,
-                 "let" : TokenType.LET]
+                 "let" : TokenType.LET,
+                 "true" : TokenType.TRUE,
+                 "false" : TokenType.FALSE,
+                 "if" : TokenType.IF,
+                 "else" : TokenType.ELSE,
+                 "return" : TokenType.RETURN,
+]
 
 func lookupIdent(ident:String) -> TokenType {
     if let key = keywords[ident] {
