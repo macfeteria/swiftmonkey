@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		D772149021DCB627007BAA3B /* Repl.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772148F21DCB627007BAA3B /* Repl.swift */; };
 		D7B356C321D91C6600DC0CB2 /* Lexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B356C221D91C6600DC0CB2 /* Lexer.swift */; };
 		D7B356C521D920B100DC0CB2 /* LexerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B356C421D920B100DC0CB2 /* LexerTests.swift */; };
 		OBJ_25 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* Token.swift */; };
@@ -56,6 +57,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D772148F21DCB627007BAA3B /* Repl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Repl.swift; sourceTree = "<group>"; };
 		D7B356C221D91C6600DC0CB2 /* Lexer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lexer.swift; sourceTree = "<group>"; };
 		D7B356C421D920B100DC0CB2 /* LexerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexerTests.swift; sourceTree = "<group>"; };
 		OBJ_11 /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
@@ -99,6 +101,7 @@
 			children = (
 				OBJ_11 /* Token.swift */,
 				D7B356C221D91C6600DC0CB2 /* Lexer.swift */,
+				D772148F21DCB627007BAA3B /* Repl.swift */,
 			);
 			name = swiftmonkey;
 			path = Sources/swiftmonkey;
@@ -261,6 +264,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				D772149021DCB627007BAA3B /* Repl.swift in Sources */,
 				D7B356C321D91C6600DC0CB2 /* Lexer.swift in Sources */,
 				OBJ_25 /* Token.swift in Sources */,
 			);
