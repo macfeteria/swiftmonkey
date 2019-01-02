@@ -34,7 +34,14 @@ public class Lexer {
         var tok: Token!
         skipWhitespace()
         switch ch {
-            case "=": tok = Token(tokenType: TokenType.ASSIGN, literal: String(ch))
+            case "=":
+                if peekChar() == "=" {
+                    let curent = ch
+                    readChar()
+                    tok = Token(tokenType: TokenType.EQUAL, literal: String("\(curent)\(ch)"))
+                } else {
+                    tok = Token(tokenType: TokenType.ASSIGN, literal: String(ch))
+                }
             case ";": tok = Token(tokenType: TokenType.SEMICOLON, literal: String(ch))
             case "(": tok = Token(tokenType: TokenType.LPAREN, literal: String(ch))
             case ")": tok = Token(tokenType: TokenType.RPAREN, literal: String(ch))
@@ -44,7 +51,14 @@ public class Lexer {
             case "-": tok = Token(tokenType: TokenType.MINUS, literal: String(ch))
             case "/": tok = Token(tokenType: TokenType.SLASH, literal: String(ch))
             case "*": tok = Token(tokenType: TokenType.ASTERISK, literal: String(ch))
-            case "!": tok = Token(tokenType: TokenType.BANG, literal: String(ch))
+            case "!":
+                if peekChar() == "=" {
+                    let curent = ch
+                    readChar()
+                    tok = Token(tokenType: TokenType.NOTEQUAL, literal: String("\(curent)\(ch)"))
+                } else {
+                    tok = Token(tokenType: TokenType.BANG, literal: String(ch))
+                }
             case "<": tok = Token(tokenType: TokenType.LESSTHAN, literal: String(ch))
             case ">": tok = Token(tokenType: TokenType.GREATER, literal: String(ch))
 
@@ -90,6 +104,15 @@ public class Lexer {
         while ((ch == " ") || (ch == "\n") ||
                (ch == "\t") || (ch == "\r")){
             readChar()
+        }
+    }
+    
+    func peekChar() -> Character {
+        if readPosition >= input.count {
+            return "\0"
+        } else {
+            let index = input.index(input.startIndex, offsetBy: readPosition)
+            return input[index]
         }
     }
     

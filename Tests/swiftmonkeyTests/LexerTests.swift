@@ -175,4 +175,30 @@ class LexerTests: XCTestCase {
         }
     }
 
+    func testEqualNotEqual() {
+        let code = """
+            10 == 10;
+            10 != 9;
+            """
+        let expectResult = [
+            Token(tokenType: TokenType.INT, literal: "10"),
+            Token(tokenType: TokenType.EQUAL, literal: "=="),
+            Token(tokenType: TokenType.INT, literal: "10"),
+            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
+
+            Token(tokenType: TokenType.INT, literal: "10"),
+            Token(tokenType: TokenType.NOTEQUAL, literal: "!="),
+            Token(tokenType: TokenType.INT, literal: "9"),
+            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
+            ]
+        
+        let lexer = Lexer(input: code)
+        for i in expectResult {
+            let tok = lexer.nextToken()
+            XCTAssert(tok.tokenType == i.tokenType, "Failed Type: \(tok.tokenType.rawValue )")
+            XCTAssert(tok.literal == i.literal, "Failed Literal: \(tok.literal)")
+        }
+    }
+
+    
 }

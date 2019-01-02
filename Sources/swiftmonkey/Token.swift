@@ -9,6 +9,10 @@ public enum TokenType:String {
     
     // Operator
     case ASSIGN = "="
+    
+    case EQUAL = "=="
+    case NOTEQUAL = "!="
+
     case PLUS   = "+"
     case MINUS  = "-"
     case BANG   = "!"
