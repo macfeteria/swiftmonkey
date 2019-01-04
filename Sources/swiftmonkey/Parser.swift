@@ -40,9 +40,20 @@ public class Parser {
         switch curToken.tokenType {
         case .LET:
             return parseLetStatement()
+        case .RETURN:
+            return parseReturnStatement()
         default:
             return nil
         }
+    }
+    
+    func parseReturnStatement() -> ReturnStatement? {
+        let statement  = ReturnStatement(token: curToken)
+        nextToken()
+        while isCurrentTokenType(type: TokenType.SEMICOLON) == false {
+            nextToken()
+        }
+        return statement
     }
     
     func parseLetStatement() -> LetStatement? {

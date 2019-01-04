@@ -53,3 +53,12 @@ struct LetStatement: Statement {
         return token.literal
     }
 }
+
+struct ReturnStatement: Statement {
+    var token:Token
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+    func statementNode() {
+    }
+}

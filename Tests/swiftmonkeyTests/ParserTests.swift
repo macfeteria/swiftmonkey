@@ -18,7 +18,7 @@ class ParserTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testParser() {
+    func testLetStatement() {
         let code = """
             let x = 5;
             let y = 10;
@@ -55,6 +55,26 @@ class ParserTests: XCTestCase {
         let parser = Parser(lexer: lexer)
         let _ = parser.parseProgram()
         XCTAssertTrue(parser.errors.count != 0)
+    }
+    
+    
+    func testReturnStatement() {
+        let code = """
+            return 5;
+            return 10;
+            return 838383;
+            """
+        
+        let lexer = Lexer(input: code)
+        let parser = Parser(lexer: lexer)
+        
+        let program = parser.parseProgram()
+        XCTAssertTrue(program.statements.count == 3)
+        
+        for statement in program.statements {           
+            XCTAssertTrue(statement.tokenLiteral() == "return")
+        }
+        
     }
 
 }
