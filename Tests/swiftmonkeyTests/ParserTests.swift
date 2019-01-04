@@ -43,5 +43,18 @@ class ParserTests: XCTestCase {
         }
         
     }
+    
+    func testParserError() {
+        let code = """
+            let x = 5;
+            let y = 10;
+            let 838383;
+            """
+        
+        let lexer = Lexer(input: code)
+        let parser = Parser(lexer: lexer)
+        let _ = parser.parseProgram()
+        XCTAssertTrue(parser.errors.count != 0)
+    }
 
 }

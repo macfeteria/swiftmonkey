@@ -19,9 +19,9 @@ public protocol Expression: Node {
     func expressionNode() -> Void
 }
 
-public struct Program {
+public struct Program: Node {
     public var statements = [Statement]()
-    func tokenLiteral() -> String {
+    public func tokenLiteral() -> String {
         if statements.count > 0 {
             return statements[0].tokenLiteral()
         } else {

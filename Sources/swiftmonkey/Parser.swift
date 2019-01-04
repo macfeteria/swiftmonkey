@@ -11,6 +11,7 @@ public class Parser {
     let lexer:Lexer
     var curToken:Token
     var peekToken:Token
+    var errors:[String] = []
 
     public init(lexer l:Lexer) {
         lexer = l
@@ -75,8 +76,16 @@ public class Parser {
             nextToken()
             return true
         } else {
+            peekError(type: type)
             return false
         }
+    }
+    
+    func peekError(type: TokenType) {
+        let error = "expected next token to be "
+            + peekToken.tokenType.rawValue
+            + ", got " + type.rawValue + " instead."
+        errors.append(error)
     }
     
 }
