@@ -39,7 +39,6 @@ public struct Program: Node  {
 }
 
 struct Identifier: Expression  {
-    
     var token:Token
     var value:String
 
@@ -52,6 +51,21 @@ struct Identifier: Expression  {
     
     func string() -> String {
         return value
+    }
+}
+
+struct IntegerLiteral: Expression {
+    var token:Token
+    var value:Int
+    func expressionNode() {
+    }
+    
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+    
+    func string() -> String {
+        return token.literal
     }
 }
 

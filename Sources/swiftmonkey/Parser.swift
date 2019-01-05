@@ -33,6 +33,7 @@ public class Parser {
         curToken = l.nextToken()
         peekToken = l.nextToken()
         registerPrefix(type: TokenType.IDENT, function: parseIdentifier)
+        registerPrefix(type: TokenType.INT, function: parseIntegerLiteral)
     }
     
     func nextToken() {
@@ -141,5 +142,15 @@ public class Parser {
     
     func parseIdentifier() -> Expression {
         return Identifier(token: curToken, value: curToken.literal)
+    }
+    
+    func parseIntegerLiteral() -> Expression {
+        if let intValue = Int(curToken.literal) {
+            return IntegerLiteral(token: curToken, value: intValue)
+        } else {
+            let error = "could not parse \(curToken.literal) as integer"
+            errors.append(error)
+            return IntegerLiteral(token: curToken, value: 0)
+        }
     }
 }

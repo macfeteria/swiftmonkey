@@ -84,6 +84,27 @@ class ParserTests: XCTestCase {
         
         let program = parser.parseProgram()
         XCTAssertTrue(program.statements.count == 1)
+        
+        let statement = program.statements[0] as! ExpressionStatement
+        let statementIdentifier = statement.expression as! Identifier
+        XCTAssertTrue(statementIdentifier.value == "foobar")
+        XCTAssertTrue(statementIdentifier.tokenLiteral() == "foobar")
     }
+    
+    func testIntegerExpression() {
+        let code = "5;"
+        
+        let lexer = Lexer(input: code)
+        let parser = Parser(lexer: lexer)
+        
+        let program = parser.parseProgram()
+        XCTAssertTrue(program.statements.count == 1)
+        
+        let statement = program.statements[0] as! ExpressionStatement
+        let statementIdentifier = statement.expression as! IntegerLiteral
+        XCTAssertTrue(statementIdentifier.value == 5)
+        XCTAssertTrue(statementIdentifier.tokenLiteral() == "5")
+    }
+
 
 }
