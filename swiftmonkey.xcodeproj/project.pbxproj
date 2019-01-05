@@ -22,6 +22,7 @@
 
 /* Begin PBXBuildFile section */
 		D758037621DE0EAD00CB65F6 /* ParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D758037521DE0EAD00CB65F6 /* ParserTests.swift */; };
+		D758037821DF5C6800CB65F6 /* AstTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D758037721DF5C6800CB65F6 /* AstTests.swift */; };
 		D772149021DCB627007BAA3B /* Repl.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772148F21DCB627007BAA3B /* Repl.swift */; };
 		D772149221DDFB3F007BAA3B /* Ast.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772149121DDFB3F007BAA3B /* Ast.swift */; };
 		D772149421DDFE0D007BAA3B /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772149321DDFE0D007BAA3B /* Parser.swift */; };
@@ -61,6 +62,7 @@
 
 /* Begin PBXFileReference section */
 		D758037521DE0EAD00CB65F6 /* ParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParserTests.swift; sourceTree = "<group>"; };
+		D758037721DF5C6800CB65F6 /* AstTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AstTests.swift; sourceTree = "<group>"; };
 		D772148F21DCB627007BAA3B /* Repl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Repl.swift; sourceTree = "<group>"; };
 		D772149121DDFB3F007BAA3B /* Ast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ast.swift; sourceTree = "<group>"; };
 		D772149321DDFE0D007BAA3B /* Parser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
@@ -129,6 +131,7 @@
 				OBJ_14 /* XCTestManifests.swift */,
 				D7B356C421D920B100DC0CB2 /* LexerTests.swift */,
 				D758037521DE0EAD00CB65F6 /* ParserTests.swift */,
+				D758037721DF5C6800CB65F6 /* AstTests.swift */,
 			);
 			name = swiftmonkeyTests;
 			path = Tests/swiftmonkeyTests;
@@ -301,6 +304,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				D758037821DF5C6800CB65F6 /* AstTests.swift in Sources */,
 				OBJ_52 /* XCTestManifests.swift in Sources */,
 				D7B356C521D920B100DC0CB2 /* LexerTests.swift in Sources */,
 				D758037621DE0EAD00CB65F6 /* ParserTests.swift in Sources */,

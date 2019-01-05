@@ -7,16 +7,32 @@
 
 import Foundation
 
+typealias prefixParseFn = () -> Expression
+typealias infixParseFn = (Expression) -> Expression
+
+enum OperatorOrder:Int {
+    case LOWEST = 1
+    case EQUALS // ==
+    case LESSGREATER // > or <
+    case SUM // +
+    case PRODUCT // *
+    case PREFIX // -X or !X
+    case CALL // myFunc(X)
+}
+
 public class Parser {
     let lexer:Lexer
     var curToken:Token
     var peekToken:Token
     var errors:[String] = []
+    var prefixParseFunctions:[TokenType:prefixParseFn] = [:]
+    var infixParseFunctions:[TokenType:infixParseFn] = [:]
 
     public init(lexer l:Lexer) {
         lexer = l
         curToken = l.nextToken()
         peekToken = l.nextToken()
+        registerPrefix(type: TokenType.IDENT, function: parseIdentifier)
     }
     
     func nextToken() {
@@ -43,12 +59,21 @@ public class Parser {
         case .RETURN:
             return parseReturnStatement()
         default:
-            return nil
+            return parseExpressStatement()
         }
     }
     
+    func parseExpressStatement() -> ExpressionStatement {
+        var statement = ExpressionStatement(token: curToken, expression: nil)
+        statement.expression = parseExpression(order: OperatorOrder.LOWEST)
+        if isPeekTokenType(type: TokenType.SEMICOLON) {
+            nextToken()
+        }
+        return statement
+    }
+    
     func parseReturnStatement() -> ReturnStatement? {
-        let statement  = ReturnStatement(token: curToken)
+        let statement  = ReturnStatement(token: curToken, returnValue: nil)
         nextToken()
         while isCurrentTokenType(type: TokenType.SEMICOLON) == false {
             nextToken()
@@ -62,7 +87,7 @@ public class Parser {
             return nil
         }
         
-        let name = Identifier(value: curToken.literal , token: curToken)
+        let name = Identifier(token: curToken, value: curToken.literal)
         if expectPeek(type: TokenType.ASSIGN) == false {
             return nil
         }
@@ -99,4 +124,22 @@ public class Parser {
         errors.append(error)
     }
     
+    func registerPrefix(type: TokenType, function: @escaping prefixParseFn) {
+        prefixParseFunctions[type] = function
+    }
+    
+    func registerInfix(type: TokenType, function: @escaping infixParseFn) {
+        infixParseFunctions[type] = function
+    }
+    
+    func parseExpression(order: OperatorOrder) -> Expression? {
+        if let prefix = prefixParseFunctions[curToken.tokenType] {
+            return prefix()
+        }
+        return nil
+    }
+    
+    func parseIdentifier() -> Expression {
+        return Identifier(token: curToken, value: curToken.literal)
+    }
 }

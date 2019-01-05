@@ -71,10 +71,19 @@ class ParserTests: XCTestCase {
         let program = parser.parseProgram()
         XCTAssertTrue(program.statements.count == 3)
         
-        for statement in program.statements {           
+        for statement in program.statements {
             XCTAssertTrue(statement.tokenLiteral() == "return")
         }
+    }
+    
+    func testIdentifierExpression() {
+        let code = "foobar;"
         
+        let lexer = Lexer(input: code)
+        let parser = Parser(lexer: lexer)
+        
+        let program = parser.parseProgram()
+        XCTAssertTrue(program.statements.count == 1)
     }
 
 }
