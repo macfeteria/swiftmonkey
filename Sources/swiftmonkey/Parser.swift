@@ -34,6 +34,9 @@ public class Parser {
         peekToken = l.nextToken()
         registerPrefix(type: TokenType.IDENT, function: parseIdentifier)
         registerPrefix(type: TokenType.INT, function: parseIntegerLiteral)
+        
+        registerPrefix(type: TokenType.BANG, function: parsePrefixExpression)
+        registerPrefix(type: TokenType.MINUS, function: parsePrefixExpression)
     }
     
     func nextToken() {
@@ -137,6 +140,7 @@ public class Parser {
         if let prefix = prefixParseFunctions[curToken.tokenType] {
             return prefix()
         }
+        noPrefixParseFunctionError(tokenType: curToken.tokenType)
         return nil
     }
     
@@ -153,4 +157,20 @@ public class Parser {
             return IntegerLiteral(token: curToken, value: 0)
         }
     }
+    
+    func parsePrefixExpression() -> Expression {
+        let token = curToken
+        nextToken()
+        let expression = PrefixExpression(token: token,
+                                          operatorLiteral: token.literal,
+                                          right: parseExpression(order: OperatorOrder.PREFIX))
+        return expression
+    }
+    
+    func noPrefixParseFunctionError(tokenType: TokenType){
+        let message = "no prefix parse function for \(tokenType.rawValue) found"
+        errors.append(message)
+    }
+    
+    
 }

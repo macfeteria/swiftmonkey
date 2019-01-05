@@ -38,37 +38,6 @@ public struct Program: Node  {
     }
 }
 
-struct Identifier: Expression  {
-    var token:Token
-    var value:String
-
-    func expressionNode() {
-    }
-
-    func tokenLiteral() -> String {
-        return token.literal
-    }
-    
-    func string() -> String {
-        return value
-    }
-}
-
-struct IntegerLiteral: Expression {
-    var token:Token
-    var value:Int
-    func expressionNode() {
-    }
-    
-    func tokenLiteral() -> String {
-        return token.literal
-    }
-    
-    func string() -> String {
-        return token.literal
-    }
-}
-
 struct LetStatement: Statement {
     var token: Token
     var name: Identifier
@@ -130,5 +99,56 @@ struct ExpressionStatement: Statement {
             return value.string()
         }
         return ""
+    }
+}
+
+// MARK: Expression
+struct Identifier: Expression  {
+    var token:Token
+    var value:String
+    
+    func expressionNode() {
+    }
+    
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+    
+    func string() -> String {
+        return value
+    }
+}
+
+struct IntegerLiteral: Expression {
+    var token:Token
+    var value:Int
+    func expressionNode() {
+    }
+    
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+    
+    func string() -> String {
+        return token.literal
+    }
+}
+
+struct PrefixExpression: Expression {
+    var token:Token
+    var operatorLiteral:String
+    var right: Expression?
+    
+    func expressionNode() {
+    }
+    
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+    
+    func string() -> String {
+        let rightEx = right?.string() ?? ""
+        let result = "(\(operatorLiteral)\(rightEx))"
+        return result
     }
 }
