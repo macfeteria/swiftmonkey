@@ -152,3 +152,23 @@ struct PrefixExpression: Expression {
         return result
     }
 }
+
+struct InfixExpression: Expression {
+    var token:Token
+    var left: Expression
+    var operatorLiteral:String
+    var right: Expression?
+    
+    func expressionNode() {
+    }
+    
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+    
+    func string() -> String {
+        let rightEx = right?.string() ?? ""
+        let result = "(\(left.string()) \(operatorLiteral) \(rightEx))"
+        return result
+    }
+}

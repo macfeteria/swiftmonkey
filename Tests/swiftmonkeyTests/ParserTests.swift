@@ -136,5 +136,41 @@ class ParserTests: XCTestCase {
         }
     }
 
+    
+    func testInfixExpression() {
+        let tests = [(code:"5 + 6;", leftValue: 5, oper:"+", rightValue:6),
+                    (code:"5 - 6;", leftValue: 5, oper:"-", rightValue:6),
+                    (code:"5 * 6;", leftValue: 5, oper:"*", rightValue:6),
+                    (code:"5 / 6;", leftValue: 5, oper:"/", rightValue:6),
+                    (code:"5 < 6;", leftValue: 5, oper:"<", rightValue:6),
+                    (code:"5 > 6;", leftValue: 5, oper:">", rightValue:6),
+                    (code:"5 == 6;", leftValue: 5, oper:"==", rightValue:6),
+                    (code:"5 != 6;", leftValue: 5, oper:"!=", rightValue:6),
+                     ]
+        
+        for test in tests {
+            let lexer = Lexer(input: test.code)
+            let parser = Parser(lexer: lexer)
+            
+            let program = parser.parseProgram()
+            XCTAssertTrue(parser.errors.count == 0)
+            for e in parser.errors {
+                print(e)
+            }
+            
+            XCTAssertTrue(program.statements.count == 1)
+            
+            let statement = program.statements[0] as! ExpressionStatement
+            let expression = statement.expression as! InfixExpression
+            
+            let leftInt = expression.left as! IntegerLiteral
+            XCTAssertTrue(leftInt.value == test.leftValue)
+
+            XCTAssertTrue(expression.operatorLiteral == test.oper)
+            
+            let rightInt = expression.right as! IntegerLiteral
+            XCTAssertTrue(rightInt.value == test.rightValue)
+        }
+    }
 
 }

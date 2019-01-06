@@ -20,6 +20,15 @@ enum OperatorOrder:Int {
     case CALL // myFunc(X)
 }
 
+var precedences:[TokenType:OperatorOrder] = [.EQUAL: .EQUALS,
+                                             .NOTEQUAL: .EQUALS,
+                                             .GREATER: .LESSGREATER,
+                                             .LESSTHAN: .LESSGREATER,
+                                             .PLUS: .SUM,
+                                             .MINUS: .SUM,
+                                             .SLASH: .PRODUCT,
+                                             .ASTERISK: .PRODUCT,]
+
 public class Parser {
     let lexer:Lexer
     var curToken:Token
@@ -27,6 +36,22 @@ public class Parser {
     var errors:[String] = []
     var prefixParseFunctions:[TokenType:prefixParseFn] = [:]
     var infixParseFunctions:[TokenType:infixParseFn] = [:]
+    var peekPercedence: OperatorOrder {
+        get {
+            if let percedence = precedences[peekToken.tokenType] {
+                return percedence
+            }
+            return OperatorOrder.LOWEST
+        }
+    }
+    var curPercedence: OperatorOrder {
+        get {
+            if let percedence = precedences[curToken.tokenType] {
+                return percedence
+            }
+            return OperatorOrder.LOWEST
+        }
+    }
 
     public init(lexer l:Lexer) {
         lexer = l
@@ -37,6 +62,15 @@ public class Parser {
         
         registerPrefix(type: TokenType.BANG, function: parsePrefixExpression)
         registerPrefix(type: TokenType.MINUS, function: parsePrefixExpression)
+        
+        registerInfix(type: TokenType.PLUS, function: parseInfixExpression)
+        registerInfix(type: TokenType.MINUS, function: parseInfixExpression)
+        registerInfix(type: TokenType.SLASH, function: parseInfixExpression)
+        registerInfix(type: TokenType.ASTERISK, function: parseInfixExpression)
+        registerInfix(type: TokenType.EQUAL, function: parseInfixExpression)
+        registerInfix(type: TokenType.NOTEQUAL, function: parseInfixExpression)
+        registerInfix(type: TokenType.LESSTHAN, function: parseInfixExpression)
+        registerInfix(type: TokenType.GREATER, function: parseInfixExpression)
     }
     
     func nextToken() {
@@ -69,7 +103,7 @@ public class Parser {
     
     func parseExpressStatement() -> ExpressionStatement {
         var statement = ExpressionStatement(token: curToken, expression: nil)
-        statement.expression = parseExpression(order: OperatorOrder.LOWEST)
+        statement.expression = parseExpression(precedence: OperatorOrder.LOWEST)
         if isPeekTokenType(type: TokenType.SEMICOLON) {
             nextToken()
         }
@@ -136,12 +170,21 @@ public class Parser {
         infixParseFunctions[type] = function
     }
     
-    func parseExpression(order: OperatorOrder) -> Expression? {
-        if let prefix = prefixParseFunctions[curToken.tokenType] {
-            return prefix()
+    func parseExpression(precedence: OperatorOrder) -> Expression? {
+        guard let prefix = prefixParseFunctions[curToken.tokenType] else {
+            noPrefixParseFunctionError(tokenType: curToken.tokenType)
+            return nil
         }
-        noPrefixParseFunctionError(tokenType: curToken.tokenType)
-        return nil
+        var leftExp = prefix()
+        while ( isPeekTokenType(type: TokenType.SEMICOLON) == false && precedence.rawValue < peekPercedence.rawValue) {
+            let infix = infixParseFunctions[peekToken.tokenType]
+            if infix == nil {
+                return leftExp
+            }
+            nextToken()
+            leftExp = infix!(leftExp)
+        }
+        return leftExp
     }
     
     func parseIdentifier() -> Expression {
@@ -163,9 +206,22 @@ public class Parser {
         nextToken()
         let expression = PrefixExpression(token: token,
                                           operatorLiteral: token.literal,
-                                          right: parseExpression(order: OperatorOrder.PREFIX))
+                                          right: parseExpression(precedence: OperatorOrder.PREFIX))
         return expression
     }
+    
+    func parseInfixExpression(left: Expression) -> Expression {
+        
+        let token = curToken
+        let precedence = curPercedence
+        nextToken()
+        let expression = InfixExpression(token: token,
+                                          left: left,
+                                          operatorLiteral: token.literal,
+                                          right: parseExpression(precedence: precedence))
+        return expression
+    }
+
     
     func noPrefixParseFunctionError(tokenType: TokenType){
         let message = "no prefix parse function for \(tokenType.rawValue) found"
