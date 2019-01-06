@@ -173,4 +173,27 @@ class ParserTests: XCTestCase {
         }
     }
 
+    func testOperatorPrecedenceParsing() {
+        let tests = [(code: "-a * b", expected: "((-a) * b)"),
+        (code: "!-a", expected: "(!(-a))"),
+        (code: "a + b + c", expected: "((a + b) + c)"),
+        (code: "a + b - c", expected: "((a + b) - c)"),
+        (code: "a * b / c", expected: "((a * b) / c)"),
+        (code: "a * b * c", expected: "((a * b) * c)"),
+        (code: "a + b * c", expected: "(a + (b * c))"),
+        (code: "a + b * c + d / e - f", expected: "(((a + (b * c)) + (d / e)) - f)"),
+        (code: "3 + 4; -5 * 5", expected: "(3 + 4)((-5) * 5)"),
+        (code: "5 > 4 == 3 < 4", expected: "((5 > 4) == (3 < 4))"),
+        (code: "5 > 4 != 3 < 4", expected: "((5 > 4) != (3 < 4))"),
+        (code: "3 + 4 * 5 == 3 * 1 + 4 * 5", expected: "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"),]
+
+        for test in tests {
+            let lexer = Lexer(input: test.code)
+            let parser = Parser(lexer: lexer)
+            
+            let program = parser.parseProgram()
+            let result = program.string()
+            XCTAssertTrue(result == test.expected)            
+        }
+    }
 }
