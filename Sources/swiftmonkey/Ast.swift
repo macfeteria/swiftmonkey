@@ -134,6 +134,21 @@ struct IntegerLiteral: Expression {
     }
 }
 
+struct Boolean: Expression {
+    var token:Token
+    var value:Bool
+    func expressionNode() {
+    }
+    
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+    
+    func string() -> String {
+        return token.literal
+    }
+}
+
 struct PrefixExpression: Expression {
     var token:Token
     var operatorLiteral:String

@@ -69,6 +69,7 @@ class ParserTests: XCTestCase {
         let parser = Parser(lexer: lexer)
         
         let program = parser.parseProgram()
+        XCTAssertTrue(parser.errors.count == 0)
         XCTAssertTrue(program.statements.count == 3)
         
         for statement in program.statements {
@@ -83,6 +84,7 @@ class ParserTests: XCTestCase {
         let parser = Parser(lexer: lexer)
         
         let program = parser.parseProgram()
+        XCTAssertTrue(parser.errors.count == 0)
         XCTAssertTrue(program.statements.count == 1)
         
         let statement = program.statements[0] as! ExpressionStatement
@@ -137,15 +139,46 @@ class ParserTests: XCTestCase {
     }
 
     
+    func testInfixExpressionBoolean() {
+        let tests = [(code:"true == true", leftValue: true, oper:"==", rightValue:true),
+                    (code:"true != false", leftValue: true, oper:"!=", rightValue:false),
+                    (code:"false == false", leftValue: false, oper:"==", rightValue:false),
+                    ]
+        
+        for test in tests {
+            let lexer = Lexer(input: test.code)
+            let parser = Parser(lexer: lexer)
+            
+            let program = parser.parseProgram()
+            XCTAssertTrue(parser.errors.count == 0)
+            for e in parser.errors {
+                print(e)
+            }
+            
+            XCTAssertTrue(program.statements.count == 1)
+            
+            let statement = program.statements[0] as! ExpressionStatement
+            let expression = statement.expression as! InfixExpression
+            
+            let leftBool = expression.left as! Boolean
+            XCTAssertTrue(leftBool.value == test.leftValue)
+
+            XCTAssertTrue(expression.operatorLiteral == test.oper)
+            
+            let rightBool = expression.right as! Boolean
+            XCTAssertTrue(rightBool.value == test.rightValue)
+        }
+    }
+
     func testInfixExpression() {
         let tests = [(code:"5 + 6;", leftValue: 5, oper:"+", rightValue:6),
-                    (code:"5 - 6;", leftValue: 5, oper:"-", rightValue:6),
-                    (code:"5 * 6;", leftValue: 5, oper:"*", rightValue:6),
-                    (code:"5 / 6;", leftValue: 5, oper:"/", rightValue:6),
-                    (code:"5 < 6;", leftValue: 5, oper:"<", rightValue:6),
-                    (code:"5 > 6;", leftValue: 5, oper:">", rightValue:6),
-                    (code:"5 == 6;", leftValue: 5, oper:"==", rightValue:6),
-                    (code:"5 != 6;", leftValue: 5, oper:"!=", rightValue:6),
+                     (code:"5 - 6;", leftValue: 5, oper:"-", rightValue:6),
+                     (code:"5 * 6;", leftValue: 5, oper:"*", rightValue:6),
+                     (code:"5 / 6;", leftValue: 5, oper:"/", rightValue:6),
+                     (code:"5 < 6;", leftValue: 5, oper:"<", rightValue:6),
+                     (code:"5 > 6;", leftValue: 5, oper:">", rightValue:6),
+                     (code:"5 == 6;", leftValue: 5, oper:"==", rightValue:6),
+                     (code:"5 != 6;", leftValue: 5, oper:"!=", rightValue:6),
                      ]
         
         for test in tests {
@@ -165,7 +198,7 @@ class ParserTests: XCTestCase {
             
             let leftInt = expression.left as! IntegerLiteral
             XCTAssertTrue(leftInt.value == test.leftValue)
-
+            
             XCTAssertTrue(expression.operatorLiteral == test.oper)
             
             let rightInt = expression.right as! IntegerLiteral
@@ -173,6 +206,7 @@ class ParserTests: XCTestCase {
         }
     }
 
+    
     func testOperatorPrecedenceParsing() {
         let tests = [(code: "-a * b", expected: "((-a) * b)"),
         (code: "!-a", expected: "(!(-a))"),
@@ -185,15 +219,40 @@ class ParserTests: XCTestCase {
         (code: "3 + 4; -5 * 5", expected: "(3 + 4)((-5) * 5)"),
         (code: "5 > 4 == 3 < 4", expected: "((5 > 4) == (3 < 4))"),
         (code: "5 > 4 != 3 < 4", expected: "((5 > 4) != (3 < 4))"),
-        (code: "3 + 4 * 5 == 3 * 1 + 4 * 5", expected: "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"),]
+        (code: "3 + 4 * 5 == 3 * 1 + 4 * 5", expected: "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"),
+        (code: "true", expected: "true"),
+        (code: "false", expected: "false"),
+        (code: "3 < 5 == true", expected: "((3 < 5) == true)"),
+        (code: "3 > 5 == false", expected: "((3 > 5) == false)"),
+        ]
 
         for test in tests {
             let lexer = Lexer(input: test.code)
             let parser = Parser(lexer: lexer)
             
             let program = parser.parseProgram()
+            XCTAssertTrue(parser.errors.count == 0)
             let result = program.string()
             XCTAssertTrue(result == test.expected)            
         }
+    }
+    
+    
+    func testBooleanExpression() {
+        let code = "true;"
+        
+        let lexer = Lexer(input: code)
+        let parser = Parser(lexer: lexer)
+        
+        let program = parser.parseProgram()
+        XCTAssertTrue(parser.errors.count == 0)
+        
+        XCTAssertTrue(program.statements.count == 1)
+
+        
+        let statement = program.statements[0] as! ExpressionStatement
+        let statementIdentifier = statement.expression as! Boolean
+        XCTAssertTrue(statementIdentifier.value == true)
+        XCTAssertTrue(statementIdentifier.tokenLiteral() == "true")
     }
 }
