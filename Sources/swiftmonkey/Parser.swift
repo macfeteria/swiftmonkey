@@ -66,6 +66,8 @@ public class Parser {
         registerPrefix(type: TokenType.TRUE, function: parseBoolean)
         registerPrefix(type: TokenType.FALSE, function: parseBoolean)
 
+        registerPrefix(type: TokenType.LPAREN, function: parseGroupExpression)
+
         registerInfix(type: TokenType.PLUS, function: parseInfixExpression)
         registerInfix(type: TokenType.MINUS, function: parseInfixExpression)
         registerInfix(type: TokenType.SLASH, function: parseInfixExpression)
@@ -235,5 +237,14 @@ public class Parser {
         errors.append(message)
     }
     
-    
+    func parseGroupExpression() -> Expression {
+        nextToken()
+
+        let exp = parseExpression(precedence: OperatorOrder.LOWEST)
+        if expectPeek(type: TokenType.RPAREN) == false {
+            return InvalidExpression()
+        }
+
+        return exp ?? InvalidExpression()
+    }
 }

@@ -168,6 +168,18 @@ struct PrefixExpression: Expression {
     }
 }
 
+struct InvalidExpression: Expression {
+    let token:Token = Token(tokenType: TokenType.ILLEGAL, literal: "")
+    func expressionNode() {
+    }
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+    func string() -> String {
+        return ""
+    }
+}
+
 struct InfixExpression: Expression {
     var token:Token
     var left: Expression

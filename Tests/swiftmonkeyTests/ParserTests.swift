@@ -138,6 +138,30 @@ class ParserTests: XCTestCase {
         }
     }
 
+    func testPrefixExpressionBoolean() {
+        let tests = [(code:"!true;", oper:"!", value:true),
+                     (code:"!false;", oper:"!", value:false),
+                     ]
+        for test in tests {
+            let lexer = Lexer(input: test.code)
+            let parser = Parser(lexer: lexer)
+            
+            let program = parser.parseProgram()
+            XCTAssertTrue(parser.errors.count == 0)
+            XCTAssertTrue(program.statements.count == 1)
+            
+            let statement = program.statements[0] as! ExpressionStatement
+            let expression = statement.expression as! PrefixExpression
+            
+            XCTAssertTrue(expression.operatorLiteral == test.oper)
+            
+            let integerLit = expression.right as! Boolean
+            XCTAssertTrue(integerLit.value == test.value)
+            XCTAssertTrue(integerLit.tokenLiteral() == "\(test.value)")
+        }
+    }
+
+    
     
     func testInfixExpressionBoolean() {
         let tests = [(code:"true == true", leftValue: true, oper:"==", rightValue:true),
@@ -224,6 +248,12 @@ class ParserTests: XCTestCase {
         (code: "false", expected: "false"),
         (code: "3 < 5 == true", expected: "((3 < 5) == true)"),
         (code: "3 > 5 == false", expected: "((3 > 5) == false)"),
+        
+        (code: "1 + (2 +3) +4", expected: "((1 + (2 + 3)) + 4)"),
+        (code: "(5 + 5) * 2", expected: "((5 + 5) * 2)"),
+        (code: "2 / (5 + 5)", expected: "(2 / (5 + 5))"),
+        (code: "-(5 + 5)", expected: "(-(5 + 5))"),
+        (code: "!(true == true)", expected: "(!(true == true))"),
         ]
 
         for test in tests {
