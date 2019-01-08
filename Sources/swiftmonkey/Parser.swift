@@ -67,6 +67,7 @@ public class Parser {
         registerPrefix(type: TokenType.FALSE, function: parseBoolean)
 
         registerPrefix(type: TokenType.LPAREN, function: parseGroupExpression)
+        registerPrefix(type: TokenType.IF, function: parseIfExpression)
 
         registerInfix(type: TokenType.PLUS, function: parseInfixExpression)
         registerInfix(type: TokenType.MINUS, function: parseInfixExpression)
@@ -246,5 +247,44 @@ public class Parser {
         }
 
         return exp ?? InvalidExpression()
+    }
+    
+    func parseBlockStatement() -> BlockStatement {
+        var block = BlockStatement(token:curToken, statements: [])
+        nextToken()
+        while isCurrentTokenType(type: TokenType.RBRACE) == false
+            && isCurrentTokenType(type: TokenType.EOF) == false
+        {
+            if let stmt = parseStatement() {
+                block.statements.append(stmt)
+            }
+            nextToken()
+        }
+        return block
+    }
+    
+    func parseIfExpression() -> Expression {
+        let token = curToken
+        if expectPeek(type: TokenType.LPAREN) == false {
+            return InvalidExpression()
+        }
+        nextToken()
+        guard let condition = parseExpression(precedence: OperatorOrder.LOWEST) else { return InvalidExpression() }
+        if !expectPeek(type: TokenType.RPAREN) { return InvalidExpression() }
+        if !expectPeek(type: TokenType.LBRACE) { return InvalidExpression() }
+
+        let consequence = parseBlockStatement()
+        var alter:BlockStatement?
+        
+        if isPeekTokenType(type: TokenType.ELSE) {
+            nextToken()
+            if !expectPeek(type: TokenType.LBRACE) {
+                return InvalidExpression()
+            }
+            alter = parseBlockStatement()
+        }
+        
+        let ifExp = IfExpression(token: token, condition: condition, consequence: consequence, alternative: alter)
+        return ifExp
     }
 }

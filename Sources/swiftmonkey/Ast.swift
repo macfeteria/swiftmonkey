@@ -199,3 +199,45 @@ struct InfixExpression: Expression {
         return result
     }
 }
+
+
+struct BlockStatement: Expression {
+    var token:Token
+    var statements = [Statement]()
+    func expressionNode() {
+    }
+    
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+    func string() -> String {
+        var result = ""
+        for s in statements {
+            result += s.string()
+        }
+        return result
+    }
+}
+
+struct IfExpression: Expression {
+    var token:Token
+    var condition: Expression
+    var consequence: BlockStatement
+    var alternative: BlockStatement?
+    
+    func expressionNode() {
+    }
+    
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+    
+    func string() -> String {
+        var result = "if \(condition.string()) \(consequence.string())"
+        if let alt = alternative {
+            result += "else \(alt.string())"
+        }
+        return result
+    }
+}
+

@@ -285,4 +285,60 @@ class ParserTests: XCTestCase {
         XCTAssertTrue(statementIdentifier.value == true)
         XCTAssertTrue(statementIdentifier.tokenLiteral() == "true")
     }
+    
+    func testIfStatement() {
+        let code = "if (x < y) { x }"
+        
+        let lexer = Lexer(input: code)
+        let parser = Parser(lexer: lexer)
+        
+        let program = parser.parseProgram()
+        XCTAssertTrue(parser.errors.count == 0)
+        for e in parser.errors {
+            print(e)
+        }
+        XCTAssertTrue(program.statements.count == 1)
+        
+        let statement = program.statements[0] as! ExpressionStatement
+        let ifExp = statement.expression as! IfExpression
+        XCTAssertTrue(ifExp.consequence.statements.count == 1)
+
+        let consequence = ifExp.consequence.statements[0] as! ExpressionStatement
+        let ident = consequence.expression as! Identifier
+        XCTAssertTrue(ident.value == "x")
+        XCTAssertTrue(ident.tokenLiteral() == "x")
+
+        XCTAssertTrue(ifExp.alternative == nil)
+    }
+    
+    func testIfElseStatement() {
+        let code = "if (x < y) { x } else { y }"
+        
+        let lexer = Lexer(input: code)
+        let parser = Parser(lexer: lexer)
+        
+        let program = parser.parseProgram()
+        XCTAssertTrue(parser.errors.count == 0)
+        for e in parser.errors {
+            print(e)
+        }
+        XCTAssertTrue(program.statements.count == 1)
+        
+        let statement = program.statements[0] as! ExpressionStatement
+        let ifExp = statement.expression as! IfExpression
+        XCTAssertTrue(ifExp.consequence.statements.count == 1)
+        
+        let consequence = ifExp.consequence.statements[0] as! ExpressionStatement
+        let ident = consequence.expression as! Identifier
+        XCTAssertTrue(ident.value == "x")
+        XCTAssertTrue(ident.tokenLiteral() == "x")
+       
+        XCTAssertNotNil(ifExp.alternative)
+        let alter = ifExp.alternative!
+        let alterStatement = alter.statements[0]  as! ExpressionStatement
+        let iden = alterStatement.expression as! Identifier
+
+        XCTAssertTrue(iden.value == "y")
+        XCTAssertTrue(iden.tokenLiteral() == "y")
+    }
 }
