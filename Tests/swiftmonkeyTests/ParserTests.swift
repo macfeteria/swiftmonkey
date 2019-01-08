@@ -341,4 +341,61 @@ class ParserTests: XCTestCase {
         XCTAssertTrue(iden.value == "y")
         XCTAssertTrue(iden.tokenLiteral() == "y")
     }
+    
+    
+    func testFunctionLiteral() {
+        let code = "fn(x, y) { x + y }"
+        
+        let lexer = Lexer(input: code)
+        let parser = Parser(lexer: lexer)
+        
+        let program = parser.parseProgram()
+        XCTAssertTrue(parser.errors.count == 0)
+        XCTAssertTrue(program.statements.count == 1)
+        
+        let statement = program.statements[0] as! ExpressionStatement
+        let function = statement.expression as! FunctionLiteral
+        XCTAssertTrue(function.parameters.count == 2)
+        
+        XCTAssertTrue(function.parameters[0].value == "x")
+        XCTAssertTrue(function.parameters[1].value == "y")
+
+        XCTAssertTrue(function.body.statements.count == 1)
+
+        let body = function.body.statements[0] as! ExpressionStatement
+        let expression = body.expression as! InfixExpression
+        
+        let leftIdent = expression.left as! Identifier
+        XCTAssertTrue(leftIdent.value == "x")
+        
+        XCTAssertTrue(expression.operatorLiteral == "+")
+        
+        let rightIdent = expression.right as! Identifier
+        XCTAssertTrue(rightIdent.value == "y")
+        
+    }
+    
+    func testFunctionParameters() {
+        let tests = [(code: "fn() {};", expected: []),
+                     (code: "fn(x) {};", expected: ["x"]),
+                     (code: "fn(x, y, z) {};", expected: ["x", "y", "z"]),
+                     ]
+
+        for test in tests {
+            let lexer = Lexer(input: test.code)
+            let parser = Parser(lexer: lexer)
+            
+            let program = parser.parseProgram()
+            XCTAssertTrue(parser.errors.count == 0)
+            XCTAssertTrue(program.statements.count == 1)
+            
+            let statement = program.statements[0] as! ExpressionStatement
+            let function = statement.expression as! FunctionLiteral
+            XCTAssertTrue(function.parameters.count == test.expected.count)
+            
+            for i in 0..<function.parameters.count {
+                XCTAssertTrue(function.parameters[i].value == test.expected[i])
+            }
+        }
+    }        
 }

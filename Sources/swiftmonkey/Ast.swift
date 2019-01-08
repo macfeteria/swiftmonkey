@@ -241,3 +241,26 @@ struct IfExpression: Expression {
     }
 }
 
+struct FunctionLiteral: Expression {
+    var token:Token
+    var parameters:[Identifier]
+    var body: BlockStatement
+    
+    func expressionNode() {
+    }
+    
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+    
+    func string() -> String {
+        var result = ""
+        var param:[String] = []
+        for p in parameters {
+            param.append(p.string())
+        }
+        let joinParam = param.joined(separator: ", ")
+        result += "\(tokenLiteral())(\(joinParam))\(body.string())"
+        return result
+    }
+}

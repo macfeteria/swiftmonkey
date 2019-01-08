@@ -69,6 +69,8 @@ public class Parser {
         registerPrefix(type: TokenType.LPAREN, function: parseGroupExpression)
         registerPrefix(type: TokenType.IF, function: parseIfExpression)
 
+        registerPrefix(type: TokenType.FUNCTION, function: parseFunctionLiteral)
+
         registerInfix(type: TokenType.PLUS, function: parseInfixExpression)
         registerInfix(type: TokenType.MINUS, function: parseInfixExpression)
         registerInfix(type: TokenType.SLASH, function: parseInfixExpression)
@@ -287,4 +289,42 @@ public class Parser {
         let ifExp = IfExpression(token: token, condition: condition, consequence: consequence, alternative: alter)
         return ifExp
     }
+    
+    func parseFunctionLiteral() -> Expression {
+        let token = curToken
+        if expectPeek(type: TokenType.LPAREN) == false {
+            return InvalidExpression()
+        }
+        let param = parseFunctionParameters()
+        if expectPeek(type: TokenType.LBRACE) == false {
+            return InvalidExpression()
+        }
+        let body = parseBlockStatement()
+        return FunctionLiteral(token:token, parameters: param, body: body)
+    }
+    
+    func parseFunctionParameters() -> [Identifier] {
+        var identfiers:[Identifier] = []
+        if isPeekTokenType(type: TokenType.RPAREN) {
+            nextToken()
+            return identfiers
+        }
+        nextToken()
+        let ident = Identifier(token: curToken, value: curToken.literal)
+        identfiers.append(ident)
+        
+        while isPeekTokenType(type: TokenType.COMMA) {
+            nextToken()
+            nextToken()
+            let idenParam = Identifier(token: curToken, value: curToken.literal)
+            identfiers.append(idenParam)
+        }
+        
+        if expectPeek(type: TokenType.RPAREN) == false {
+            return []
+        }
+        return identfiers
+    }
+    
+    
 }
