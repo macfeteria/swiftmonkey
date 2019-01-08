@@ -248,12 +248,17 @@ class ParserTests: XCTestCase {
         (code: "false", expected: "false"),
         (code: "3 < 5 == true", expected: "((3 < 5) == true)"),
         (code: "3 > 5 == false", expected: "((3 > 5) == false)"),
-        
+
         (code: "1 + (2 +3) +4", expected: "((1 + (2 + 3)) + 4)"),
         (code: "(5 + 5) * 2", expected: "((5 + 5) * 2)"),
         (code: "2 / (5 + 5)", expected: "(2 / (5 + 5))"),
         (code: "-(5 + 5)", expected: "(-(5 + 5))"),
         (code: "!(true == true)", expected: "(!(true == true))"),
+
+        (code: "a + add(b * c) + d", expected: "((a + add((b * c))) + d)"),
+        (code: "add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", expected: "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"),
+        (code: "add(a + b + c * d / f + g)", expected: "add((((a + b) + ((c * d) / f)) + g))"),
+
         ]
 
         for test in tests {
@@ -263,7 +268,8 @@ class ParserTests: XCTestCase {
             let program = parser.parseProgram()
             XCTAssertTrue(parser.errors.count == 0)
             let result = program.string()
-            XCTAssertTrue(result == test.expected)            
+            XCTAssertTrue(result == test.expected)
+            print(result)
         }
     }
     
@@ -397,5 +403,44 @@ class ParserTests: XCTestCase {
                 XCTAssertTrue(function.parameters[i].value == test.expected[i])
             }
         }
-    }        
+    }
+    
+    func testCallExpressionParsing() {
+        let code = "add(1, 2 * 3, 4 + 5);"
+        
+        let lexer = Lexer(input: code)
+        let parser = Parser(lexer: lexer)
+        
+        let program = parser.parseProgram()
+        XCTAssertTrue(parser.errors.count == 0)
+        XCTAssertTrue(program.statements.count == 1)
+        
+        let statement = program.statements[0] as! ExpressionStatement
+        let expression = statement.expression as! CallExpression
+        
+        let functionIden = expression.function as! Identifier
+        XCTAssertTrue(functionIden.value == "add")
+
+        XCTAssertTrue(expression.arguments.count == 3)
+
+        let param0 = expression.arguments[0] as! IntegerLiteral
+        XCTAssertTrue(param0.value == 1)
+        
+        let param1 = expression.arguments[1] as! InfixExpression
+        let leftIdent1 = param1.left as! IntegerLiteral
+        XCTAssertTrue(leftIdent1.value == 2)
+        XCTAssertTrue(param1.operatorLiteral == "*")
+        let rightIdent1 = param1.right as! IntegerLiteral
+        XCTAssertTrue(rightIdent1.value == 3)
+
+        let param2 = expression.arguments[2] as! InfixExpression
+        let leftIdent2 = param2.left as! IntegerLiteral
+        XCTAssertTrue(leftIdent2.value == 4)
+        XCTAssertTrue(param2.operatorLiteral == "+")
+        let rightIdent2 = param2.right as! IntegerLiteral
+        XCTAssertTrue(rightIdent2.value == 5)
+
+        
+    }
+    
 }

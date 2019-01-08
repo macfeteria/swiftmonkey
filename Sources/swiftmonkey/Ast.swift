@@ -264,3 +264,27 @@ struct FunctionLiteral: Expression {
         return result
     }
 }
+
+struct CallExpression: Expression {
+    var token:Token
+    var function:Expression
+    var arguments: [Expression]
+    
+    func expressionNode() {
+    }
+    
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+    
+    func string() -> String {
+        var result = ""
+        var args:[String] = []
+        for a in arguments {
+            args.append(a.string())
+        }
+        let joinArgs = args.joined(separator: ", ")
+        result += "\(function.string())(\(joinArgs))"
+        return result
+    }
+}

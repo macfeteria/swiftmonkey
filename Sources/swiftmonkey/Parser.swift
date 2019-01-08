@@ -27,7 +27,8 @@ var precedences:[TokenType:OperatorOrder] = [.EQUAL: .EQUALS,
                                              .PLUS: .SUM,
                                              .MINUS: .SUM,
                                              .SLASH: .PRODUCT,
-                                             .ASTERISK: .PRODUCT,]
+                                             .ASTERISK: .PRODUCT,
+                                             .LPAREN: .CALL,]
 
 public class Parser {
     let lexer:Lexer
@@ -79,6 +80,9 @@ public class Parser {
         registerInfix(type: TokenType.NOTEQUAL, function: parseInfixExpression)
         registerInfix(type: TokenType.LESSTHAN, function: parseInfixExpression)
         registerInfix(type: TokenType.GREATER, function: parseInfixExpression)
+
+        registerInfix(type: TokenType.LPAREN, function: parseCallExpression)
+
     }
     
     func nextToken() {
@@ -326,5 +330,35 @@ public class Parser {
         return identfiers
     }
     
+    func parseCallExpression(function: Expression) -> Expression {
+        let token = curToken
+        let args = parseCallArguments()
+        return CallExpression(token: token, function: function, arguments: args)
+    }
     
+    func parseCallArguments() -> [Expression] {
+        var args:[Expression] = []
+        if isPeekTokenType(type: TokenType.RPAREN) {
+            nextToken()
+            return args
+        }
+        nextToken()
+        if let ex = parseExpression(precedence: OperatorOrder.LOWEST) {
+            args.append(ex)
+        }
+        
+        while isPeekTokenType(type: TokenType.COMMA) {
+            nextToken()
+            nextToken()
+            if let ex = parseExpression(precedence: OperatorOrder.LOWEST) {
+                args.append(ex)
+            }
+        }
+        
+        if expectPeek(type: TokenType.RPAREN) == false {
+            return []
+        }
+        return args
+    }
+
 }
