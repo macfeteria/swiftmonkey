@@ -28,6 +28,9 @@
 		D772149421DDFE0D007BAA3B /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772149321DDFE0D007BAA3B /* Parser.swift */; };
 		D7B356C321D91C6600DC0CB2 /* Lexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B356C221D91C6600DC0CB2 /* Lexer.swift */; };
 		D7B356C521D920B100DC0CB2 /* LexerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B356C421D920B100DC0CB2 /* LexerTests.swift */; };
+		D7E3A04921E73272006D19CE /* Object.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E3A04821E73272006D19CE /* Object.swift */; };
+		D7E3A04B21E73831006D19CE /* Evaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E3A04A21E73831006D19CE /* Evaluator.swift */; };
+		D7E3A04D21E7414D006D19CE /* EvaluatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E3A04C21E7414D006D19CE /* EvaluatorTests.swift */; };
 		OBJ_25 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* Token.swift */; };
 		OBJ_32 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* main.swift */; };
 		OBJ_34 /* swiftmonkey.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "swiftmonkey::swiftmonkey::Product" /* swiftmonkey.framework */; };
@@ -68,6 +71,9 @@
 		D772149321DDFE0D007BAA3B /* Parser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
 		D7B356C221D91C6600DC0CB2 /* Lexer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lexer.swift; sourceTree = "<group>"; };
 		D7B356C421D920B100DC0CB2 /* LexerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexerTests.swift; sourceTree = "<group>"; };
+		D7E3A04821E73272006D19CE /* Object.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Object.swift; sourceTree = "<group>"; };
+		D7E3A04A21E73831006D19CE /* Evaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Evaluator.swift; sourceTree = "<group>"; };
+		D7E3A04C21E7414D006D19CE /* EvaluatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvaluatorTests.swift; sourceTree = "<group>"; };
 		OBJ_11 /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		OBJ_14 /* XCTestManifests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTestManifests.swift; sourceTree = "<group>"; };
 		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
@@ -112,6 +118,8 @@
 				D772148F21DCB627007BAA3B /* Repl.swift */,
 				D772149121DDFB3F007BAA3B /* Ast.swift */,
 				D772149321DDFE0D007BAA3B /* Parser.swift */,
+				D7E3A04821E73272006D19CE /* Object.swift */,
+				D7E3A04A21E73831006D19CE /* Evaluator.swift */,
 			);
 			name = swiftmonkey;
 			path = Sources/swiftmonkey;
@@ -132,6 +140,7 @@
 				D7B356C421D920B100DC0CB2 /* LexerTests.swift */,
 				D758037521DE0EAD00CB65F6 /* ParserTests.swift */,
 				D758037721DF5C6800CB65F6 /* AstTests.swift */,
+				D7E3A04C21E7414D006D19CE /* EvaluatorTests.swift */,
 			);
 			name = swiftmonkeyTests;
 			path = Tests/swiftmonkeyTests;
@@ -277,9 +286,11 @@
 			buildActionMask = 0;
 			files = (
 				D772149221DDFB3F007BAA3B /* Ast.swift in Sources */,
+				D7E3A04B21E73831006D19CE /* Evaluator.swift in Sources */,
 				D772149021DCB627007BAA3B /* Repl.swift in Sources */,
 				D772149421DDFE0D007BAA3B /* Parser.swift in Sources */,
 				D7B356C321D91C6600DC0CB2 /* Lexer.swift in Sources */,
+				D7E3A04921E73272006D19CE /* Object.swift in Sources */,
 				OBJ_25 /* Token.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -308,6 +319,7 @@
 				OBJ_52 /* XCTestManifests.swift in Sources */,
 				D7B356C521D920B100DC0CB2 /* LexerTests.swift in Sources */,
 				D758037621DE0EAD00CB65F6 /* ParserTests.swift in Sources */,
+				D7E3A04D21E7414D006D19CE /* EvaluatorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

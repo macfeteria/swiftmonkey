@@ -25,7 +25,9 @@ public func startRepl () {
                     print("\t \(e)")
                 }
             } else {
-                print(program.string())
+                let evaluated = Evaluator()
+                let result = evaluated.eval(node: program)
+                print(result.inspect())
             }
         }
     } while (input != nil)
