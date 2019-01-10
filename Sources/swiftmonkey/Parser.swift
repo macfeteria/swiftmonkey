@@ -123,12 +123,15 @@ public class Parser {
     }
     
     func parseReturnStatement() -> ReturnStatement? {
-        let statement  = ReturnStatement(token: curToken, returnValue: nil)
+        let token = curToken
         nextToken()
-        while isCurrentTokenType(type: TokenType.SEMICOLON) == false {
+        
+        let returnValue = parseExpression(precedence: OperatorOrder.LOWEST)
+        while isPeekTokenType(type: TokenType.SEMICOLON){
             nextToken()
         }
-        return statement
+
+        return ReturnStatement(token: token, returnValue: returnValue)
     }
     
     func parseLetStatement() -> LetStatement? {
@@ -142,11 +145,14 @@ public class Parser {
             return nil
         }
         
-        while isCurrentTokenType(type: TokenType.SEMICOLON) == false {
+        nextToken()
+        let expression = parseExpression(precedence: OperatorOrder.LOWEST)
+        
+        while isPeekTokenType(type: TokenType.SEMICOLON) {
             nextToken()
         }
         
-        return LetStatement(token: token, name: name, value: nil)
+        return LetStatement(token: token, name: name, value: expression)
     }
     
     func isCurrentTokenType(type: TokenType) -> Bool {

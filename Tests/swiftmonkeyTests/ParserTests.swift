@@ -10,36 +10,85 @@ import XCTest
 
 class ParserTests: XCTestCase {
 
-    override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    func validateLiteralExpression<T>(expression: Expression?, result: T) {
+        guard let expression = expression else {
+            XCTAssertTrue(false)
+            return
+        }
+        if T.self is IntegerLiteral.Type {
+            let identExpression = expression as! Identifier
+            let resultString = result as! String
+            validateIdentifier(identifier: identExpression, result: resultString)
+        }
+        if T.self is Identifier.Type {
+            let integerExpression = expression as! IntegerLiteral
+            let resultInt = result as! Int
+            validateInteger(integerLiteral: integerExpression, result: resultInt)
+        }
+        if T.self is Boolean.Type {
+            let boolean = expression as! Boolean
+            let resultBoolean = result as! Bool
+            validateBoolean(boolean: boolean, result: resultBoolean)
+        }
+    }
+    
+    func validateInteger(integerLiteral: IntegerLiteral, result: Int ) {
+        XCTAssertTrue(integerLiteral.value == result)
+        XCTAssertTrue(integerLiteral.tokenLiteral() == "\(result)")
+    }
+    
+    func validateIdentifier(identifier: Identifier, result: String ) {
+        XCTAssertTrue(identifier.value == result)
+        XCTAssertTrue(identifier.tokenLiteral() == result)
+    }
+    
+    func validateBoolean(boolean: Boolean, result: Bool) {
+        XCTAssertTrue(boolean.value == result)
+        XCTAssertTrue(boolean.tokenLiteral() == String(result))
     }
 
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    func validateInfix<T>(infix: InfixExpression, left: T, op: String, right: T) {
+        validateLiteralExpression(expression: infix, result: left)
+        XCTAssertTrue(infix.operatorLiteral == op)
+        validateLiteralExpression(expression: infix, result: right)
     }
-
+    
+    func validateInfix<T>(statement: ExpressionStatement, left: T, op: String, right: T) {
+        let infix = statement.expression as! InfixExpression
+        validateInfix(infix: infix, left: left, op: op, right: right)
+    }
+    
+    func validateParserError(parser: Parser) {
+        for e in parser.errors {
+            print(e)
+        }
+        XCTAssertTrue(parser.errors.count == 0)
+    }
+    
     func testLetStatement() {
-        let code = """
-            let x = 5;
-            let y = 10;
-            let foobar = 838383;
-            """
-
-        let lexer = Lexer(input: code)
-        let parser = Parser(lexer: lexer)
-
-        let program = parser.parseProgram()
-        XCTAssertTrue(program.statements.count == 3)
         
-        let expectIdentifier = ["x", "y", "foobar"]
+        struct stmt {
+            var code:String
+            var expectedIdentifier:String
+            var expectedValue:Any
+        }
         
-        for (index, element) in expectIdentifier.enumerated() {
-            let statement = program.statements[index]
-            XCTAssertTrue(statement.tokenLiteral() == "let")
+        let tests = [stmt(code:"let x = 5;", expectedIdentifier:"x", expectedValue:5),
+                     stmt(code:"let y = true;", expectedIdentifier:"y", expectedValue:false),
+                     stmt(code:"let foo = y;", expectedIdentifier:"foo", expectedValue:"y"),
+                     ]
+        for test in tests {
+            let lexer = Lexer(input: test.code)
+            let parser = Parser(lexer: lexer)
             
-            let letStatement = statement as! LetStatement
-            XCTAssertTrue(letStatement.name.tokenLiteral() == element)
-            XCTAssertTrue(letStatement.name.value  == element)
+            let program = parser.parseProgram()
+            validateParserError(parser: parser)
+            
+            let letStatement = program.statements[0] as! LetStatement
+            XCTAssertTrue(letStatement.name.tokenLiteral() == test.expectedIdentifier)
+            XCTAssertTrue(letStatement.name.value  == test.expectedIdentifier)
+            
+            validateLiteralExpression(expression: letStatement.value, result: test.expectedValue)
         }
         
     }
@@ -69,7 +118,8 @@ class ParserTests: XCTestCase {
         let parser = Parser(lexer: lexer)
         
         let program = parser.parseProgram()
-        XCTAssertTrue(parser.errors.count == 0)
+        validateParserError(parser: parser)
+
         XCTAssertTrue(program.statements.count == 3)
         
         for statement in program.statements {
@@ -84,13 +134,11 @@ class ParserTests: XCTestCase {
         let parser = Parser(lexer: lexer)
         
         let program = parser.parseProgram()
-        XCTAssertTrue(parser.errors.count == 0)
+        validateParserError(parser: parser)
         XCTAssertTrue(program.statements.count == 1)
         
-        let statement = program.statements[0] as! ExpressionStatement
-        let statementIdentifier = statement.expression as! Identifier
-        XCTAssertTrue(statementIdentifier.value == "foobar")
-        XCTAssertTrue(statementIdentifier.tokenLiteral() == "foobar")
+        let stmt = program.statements[0] as! ExpressionStatement
+        validateLiteralExpression(expression: stmt.expression!, result: "foobar")
     }
     
     func testIntegerExpression() {
@@ -100,14 +148,11 @@ class ParserTests: XCTestCase {
         let parser = Parser(lexer: lexer)
         
         let program = parser.parseProgram()
-        XCTAssertTrue(parser.errors.count == 0)
-
+        validateParserError(parser: parser)
         XCTAssertTrue(program.statements.count == 1)
         
-        let statement = program.statements[0] as! ExpressionStatement
-        let statementIdentifier = statement.expression as! IntegerLiteral
-        XCTAssertTrue(statementIdentifier.value == 5)
-        XCTAssertTrue(statementIdentifier.tokenLiteral() == "5")
+        let stmt = program.statements[0] as! ExpressionStatement
+        validateLiteralExpression(expression: stmt.expression!, result: 5)
     }
 
     
@@ -120,10 +165,7 @@ class ParserTests: XCTestCase {
             let parser = Parser(lexer: lexer)
             
             let program = parser.parseProgram()
-            XCTAssertTrue(parser.errors.count == 0)
-            for e in parser.errors {
-                print(e)
-            }
+            validateParserError(parser: parser)
 
             XCTAssertTrue(program.statements.count == 1)
             
@@ -147,7 +189,7 @@ class ParserTests: XCTestCase {
             let parser = Parser(lexer: lexer)
             
             let program = parser.parseProgram()
-            XCTAssertTrue(parser.errors.count == 0)
+            validateParserError(parser: parser)
             XCTAssertTrue(program.statements.count == 1)
             
             let statement = program.statements[0] as! ExpressionStatement
@@ -161,48 +203,26 @@ class ParserTests: XCTestCase {
         }
     }
 
-    
-    
-    func testInfixExpressionBoolean() {
-        let tests = [(code:"true == true", leftValue: true, oper:"==", rightValue:true),
-                    (code:"true != false", leftValue: true, oper:"!=", rightValue:false),
-                    (code:"false == false", leftValue: false, oper:"==", rightValue:false),
-                    ]
-        
-        for test in tests {
-            let lexer = Lexer(input: test.code)
-            let parser = Parser(lexer: lexer)
-            
-            let program = parser.parseProgram()
-            XCTAssertTrue(parser.errors.count == 0)
-            for e in parser.errors {
-                print(e)
-            }
-            
-            XCTAssertTrue(program.statements.count == 1)
-            
-            let statement = program.statements[0] as! ExpressionStatement
-            let expression = statement.expression as! InfixExpression
-            
-            let leftBool = expression.left as! Boolean
-            XCTAssertTrue(leftBool.value == test.leftValue)
-
-            XCTAssertTrue(expression.operatorLiteral == test.oper)
-            
-            let rightBool = expression.right as! Boolean
-            XCTAssertTrue(rightBool.value == test.rightValue)
-        }
-    }
-
     func testInfixExpression() {
-        let tests = [(code:"5 + 6;", leftValue: 5, oper:"+", rightValue:6),
-                     (code:"5 - 6;", leftValue: 5, oper:"-", rightValue:6),
-                     (code:"5 * 6;", leftValue: 5, oper:"*", rightValue:6),
-                     (code:"5 / 6;", leftValue: 5, oper:"/", rightValue:6),
-                     (code:"5 < 6;", leftValue: 5, oper:"<", rightValue:6),
-                     (code:"5 > 6;", leftValue: 5, oper:">", rightValue:6),
-                     (code:"5 == 6;", leftValue: 5, oper:"==", rightValue:6),
-                     (code:"5 != 6;", leftValue: 5, oper:"!=", rightValue:6),
+        struct infix {
+            var code:String
+            var leftValue:Any
+            var oper:String
+            var rightValue:Any
+        }
+        
+        let tests = [infix(code:"5 + 6;", leftValue: 5, oper:"+", rightValue:6),
+                     infix(code:"5 - 6;", leftValue: 5, oper:"-", rightValue:6),
+                     infix(code:"5 * 6;", leftValue: 5, oper:"*", rightValue:6),
+                     infix(code:"5 / 6;", leftValue: 5, oper:"/", rightValue:6),
+                     infix(code:"5 < 6;", leftValue: 5, oper:"<", rightValue:6),
+                     infix(code:"5 > 6;", leftValue: 5, oper:">", rightValue:6),
+                     infix(code:"5 == 6;", leftValue: 5, oper:"==", rightValue:6),
+                     infix(code:"5 != 6;", leftValue: 5, oper:"!=", rightValue:6),
+                     
+                     infix(code:"true == true", leftValue: true, oper:"==", rightValue:true),
+                     infix(code:"true != false", leftValue: true, oper:"!=", rightValue:false),
+                     infix(code:"false == false", leftValue: false, oper:"==", rightValue:false),
                      ]
         
         for test in tests {
@@ -210,23 +230,13 @@ class ParserTests: XCTestCase {
             let parser = Parser(lexer: lexer)
             
             let program = parser.parseProgram()
-            XCTAssertTrue(parser.errors.count == 0)
-            for e in parser.errors {
-                print(e)
-            }
-            
+            validateParserError(parser: parser)
+
             XCTAssertTrue(program.statements.count == 1)
             
             let statement = program.statements[0] as! ExpressionStatement
-            let expression = statement.expression as! InfixExpression
-            
-            let leftInt = expression.left as! IntegerLiteral
-            XCTAssertTrue(leftInt.value == test.leftValue)
-            
-            XCTAssertTrue(expression.operatorLiteral == test.oper)
-            
-            let rightInt = expression.right as! IntegerLiteral
-            XCTAssertTrue(rightInt.value == test.rightValue)
+            validateInfix(statement: statement, left: test.leftValue, op: test.oper, right: test.rightValue)
+
         }
     }
 
@@ -266,10 +276,9 @@ class ParserTests: XCTestCase {
             let parser = Parser(lexer: lexer)
             
             let program = parser.parseProgram()
-            XCTAssertTrue(parser.errors.count == 0)
+            validateParserError(parser: parser)
             let result = program.string()
             XCTAssertTrue(result == test.expected)
-            print(result)
         }
     }
     
@@ -281,15 +290,13 @@ class ParserTests: XCTestCase {
         let parser = Parser(lexer: lexer)
         
         let program = parser.parseProgram()
-        XCTAssertTrue(parser.errors.count == 0)
-        
+        validateParserError(parser: parser)
+
         XCTAssertTrue(program.statements.count == 1)
 
         
         let statement = program.statements[0] as! ExpressionStatement
-        let statementIdentifier = statement.expression as! Boolean
-        XCTAssertTrue(statementIdentifier.value == true)
-        XCTAssertTrue(statementIdentifier.tokenLiteral() == "true")
+        validateLiteralExpression(expression: statement.expression!, result: true)
     }
     
     func testIfStatement() {
@@ -299,22 +306,16 @@ class ParserTests: XCTestCase {
         let parser = Parser(lexer: lexer)
         
         let program = parser.parseProgram()
-        XCTAssertTrue(parser.errors.count == 0)
-        for e in parser.errors {
-            print(e)
-        }
+        validateParserError(parser: parser)
         XCTAssertTrue(program.statements.count == 1)
         
         let statement = program.statements[0] as! ExpressionStatement
         let ifExp = statement.expression as! IfExpression
+        XCTAssertTrue(ifExp.alternative == nil)
         XCTAssertTrue(ifExp.consequence.statements.count == 1)
 
         let consequence = ifExp.consequence.statements[0] as! ExpressionStatement
-        let ident = consequence.expression as! Identifier
-        XCTAssertTrue(ident.value == "x")
-        XCTAssertTrue(ident.tokenLiteral() == "x")
-
-        XCTAssertTrue(ifExp.alternative == nil)
+        validateLiteralExpression(expression: consequence.expression, result: "x")
     }
     
     func testIfElseStatement() {
@@ -324,10 +325,7 @@ class ParserTests: XCTestCase {
         let parser = Parser(lexer: lexer)
         
         let program = parser.parseProgram()
-        XCTAssertTrue(parser.errors.count == 0)
-        for e in parser.errors {
-            print(e)
-        }
+        validateParserError(parser: parser)
         XCTAssertTrue(program.statements.count == 1)
         
         let statement = program.statements[0] as! ExpressionStatement
@@ -335,21 +333,18 @@ class ParserTests: XCTestCase {
         XCTAssertTrue(ifExp.consequence.statements.count == 1)
         
         let consequence = ifExp.consequence.statements[0] as! ExpressionStatement
-        let ident = consequence.expression as! Identifier
-        XCTAssertTrue(ident.value == "x")
-        XCTAssertTrue(ident.tokenLiteral() == "x")
+        validateLiteralExpression(expression: consequence.expression, result: "x")
+
        
         XCTAssertNotNil(ifExp.alternative)
         let alter = ifExp.alternative!
         let alterStatement = alter.statements[0]  as! ExpressionStatement
-        let iden = alterStatement.expression as! Identifier
-
-        XCTAssertTrue(iden.value == "y")
-        XCTAssertTrue(iden.tokenLiteral() == "y")
+        
+        validateLiteralExpression(expression: alterStatement.expression, result: true)
     }
     
     
-    func testFunctionLiteral() {
+    func testFunctionExpression() {
         let code = "fn(x, y) { x + y }"
         
         let lexer = Lexer(input: code)
@@ -363,22 +358,12 @@ class ParserTests: XCTestCase {
         let function = statement.expression as! FunctionLiteral
         XCTAssertTrue(function.parameters.count == 2)
         
-        XCTAssertTrue(function.parameters[0].value == "x")
-        XCTAssertTrue(function.parameters[1].value == "y")
-
+        validateIdentifier(identifier: function.parameters[0], result: "x")
+        validateIdentifier(identifier: function.parameters[1], result: "y")
+        
         XCTAssertTrue(function.body.statements.count == 1)
-
         let body = function.body.statements[0] as! ExpressionStatement
-        let expression = body.expression as! InfixExpression
-        
-        let leftIdent = expression.left as! Identifier
-        XCTAssertTrue(leftIdent.value == "x")
-        
-        XCTAssertTrue(expression.operatorLiteral == "+")
-        
-        let rightIdent = expression.right as! Identifier
-        XCTAssertTrue(rightIdent.value == "y")
-        
+        validateInfix(statement: body, left: "x", op: "+", right: "y")
     }
     
     func testFunctionParameters() {
@@ -392,15 +377,15 @@ class ParserTests: XCTestCase {
             let parser = Parser(lexer: lexer)
             
             let program = parser.parseProgram()
-            XCTAssertTrue(parser.errors.count == 0)
+            validateParserError(parser: parser)
             XCTAssertTrue(program.statements.count == 1)
             
             let statement = program.statements[0] as! ExpressionStatement
             let function = statement.expression as! FunctionLiteral
             XCTAssertTrue(function.parameters.count == test.expected.count)
             
-            for i in 0..<function.parameters.count {
-                XCTAssertTrue(function.parameters[i].value == test.expected[i])
+            for i in 0 ..< function.parameters.count {
+                validateIdentifier(identifier: function.parameters[i], result: test.expected[i])
             }
         }
     }
@@ -412,35 +397,24 @@ class ParserTests: XCTestCase {
         let parser = Parser(lexer: lexer)
         
         let program = parser.parseProgram()
-        XCTAssertTrue(parser.errors.count == 0)
+        validateParserError(parser: parser)
         XCTAssertTrue(program.statements.count == 1)
         
         let statement = program.statements[0] as! ExpressionStatement
         let expression = statement.expression as! CallExpression
         
         let functionIden = expression.function as! Identifier
-        XCTAssertTrue(functionIden.value == "add")
+        validateIdentifier(identifier: functionIden, result: "add")
 
         XCTAssertTrue(expression.arguments.count == 3)
-
-        let param0 = expression.arguments[0] as! IntegerLiteral
-        XCTAssertTrue(param0.value == 1)
+        
+        validateLiteralExpression(expression: expression.arguments[0], result: 1)
         
         let param1 = expression.arguments[1] as! InfixExpression
-        let leftIdent1 = param1.left as! IntegerLiteral
-        XCTAssertTrue(leftIdent1.value == 2)
-        XCTAssertTrue(param1.operatorLiteral == "*")
-        let rightIdent1 = param1.right as! IntegerLiteral
-        XCTAssertTrue(rightIdent1.value == 3)
-
         let param2 = expression.arguments[2] as! InfixExpression
-        let leftIdent2 = param2.left as! IntegerLiteral
-        XCTAssertTrue(leftIdent2.value == 4)
-        XCTAssertTrue(param2.operatorLiteral == "+")
-        let rightIdent2 = param2.right as! IntegerLiteral
-        XCTAssertTrue(rightIdent2.value == 5)
-
         
+        validateInfix(infix: param1, left: 2, op: "*", right: 3)
+        validateInfix(infix: param2, left: 4, op: "+", right: 5)
     }
     
 }

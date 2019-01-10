@@ -18,11 +18,14 @@ public func startRepl () {
         input = readLine()
         if let code = input , code.count > 0{
             let lexer = Lexer(input: code)
-            var tok:Token = lexer.nextToken()
-            
-            while tok.tokenType != TokenType.EOF {
-                print("\(tok.tokenType) \(tok.literal)")
-                tok = lexer.nextToken()
+            let parser = Parser(lexer: lexer)
+            let program = parser.parseProgram()
+            if parser.errors.count != 0 {
+                for e in parser.errors {
+                    print("\t \(e)")
+                }
+            } else {
+                print(program.string())
             }
         }
     } while (input != nil)
