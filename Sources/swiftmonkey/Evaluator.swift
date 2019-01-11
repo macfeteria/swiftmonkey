@@ -8,6 +8,10 @@
 import Foundation
 
 public struct Evaluator {
+    static let TRUE = BooleanObj(value: true)
+    static let FALSE = BooleanObj(value: false)
+    static let NULL = NullObj()
+
     public func eval(node: Node) -> Object {
         switch node {
         case is Program:
@@ -21,11 +25,21 @@ public struct Evaluator {
             return IntegerObj(value: int.value)
         case is Boolean:
             let boolean = node as! Boolean
-            return BooleanObj(value: boolean.value)
+            return boolean.value ? Evaluator.TRUE : Evaluator.FALSE
+        case is PrefixExpression:
+            let pre = node as! PrefixExpression
+            let right = eval(node: pre.right!)
+            return evalPrefixExpression(oper: pre.operatorLiteral, right: right)
+        case is InfixExpression:
+            let infix = node as! InfixExpression
+            let left = eval(node: infix.left)
+            let right = eval(node: infix.right!)
+            return evalInfixExpression(oper: infix.operatorLiteral, left: left, right: right)
         default:
-            return NullObj()
+            return Evaluator.NULL
         }
     }
+    
     
     func eval(statements:[Statement]) -> Object {
         var result: Object = NullObj()
@@ -33,5 +47,60 @@ public struct Evaluator {
             result = eval(node: s)
         }
         return result
+    }
+    
+    func evalInfixExpression(oper: String, left:Object, right: Object) -> Object {
+        if left.type() == ObjectType.INTEGER && right.type() == ObjectType.INTEGER {
+            return evalIntegerExpression(oper: oper, left: left, right: right)
+        }
+        return Evaluator.NULL
+    }
+
+    
+    func evalPrefixExpression(oper: String, right: Object) -> Object {
+        switch oper {
+        case "!" :
+            return evalBangOperator(right: right)
+        case "-" :
+            return evalMinusPrefixOperator(right: right)
+        default:
+            return Evaluator.NULL
+        }
+    }
+
+    func evalIntegerExpression(oper: String, left:Object, right: Object) -> Object {
+        let leftValue = (left as! IntegerObj).value
+        let rightValue = (right as! IntegerObj).value
+        switch oper {
+        case "+" :
+            return IntegerObj(value: leftValue + rightValue)
+        case "-" :
+            return IntegerObj(value: leftValue - rightValue)
+        case "*" :
+            return IntegerObj(value: leftValue * rightValue)
+        case "/" :
+            return IntegerObj(value: leftValue / rightValue)
+        default:
+            return Evaluator.NULL
+        }
+    }
+    func evalMinusPrefixOperator(right: Object) -> Object {
+        if right.type() != ObjectType.INTEGER {
+            return Evaluator.NULL
+        }
+        let intObj = right as! IntegerObj
+        return IntegerObj(value: -intObj.value)
+    }
+    
+    func evalBangOperator(right: Object) -> Object {
+        switch right {
+        case is BooleanObj:
+            let bool = right as! BooleanObj
+            return bool.value ? Evaluator.FALSE : Evaluator.TRUE
+        case is NullObj:
+            return Evaluator.TRUE
+        default:
+            return Evaluator.FALSE
+        }
     }
 }

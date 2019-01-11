@@ -32,6 +32,20 @@ class EvaluatorTests: XCTestCase {
     func testEvalIntegerExpression () {
         let tests = [(code:"5",expectedValue:5),
                      (code:"10",expectedValue:10),
+                     (code:"-10",expectedValue:-10),
+                     (code:"-5",expectedValue:-5),
+                     
+                     (code:"5 + 5 + 5 + 5 -10", expectedValue:10),
+                     (code:"2 * 2 * 2 * 2 * 2", expectedValue:32),
+                     (code:"-50 + 100 -50", expectedValue:0),
+                     (code:"5 * 2 + 10", expectedValue:20),
+                     (code:"5 + 2 * 10", expectedValue:25),
+                     (code:"50 / 2 * 2 + 10", expectedValue:60),
+                     (code:"2 * (5 + 10)", expectedValue:30),
+                     (code:"3 * (3 * 3) + 10", expectedValue:37),
+                     (code:"3 * 3 * 3 + 10", expectedValue:37),
+                     (code:"(5 + 10 * 2 + 15 / 3) * 2 + -10", expectedValue:50),
+    
                      ]
         
         for test in tests {
@@ -43,6 +57,21 @@ class EvaluatorTests: XCTestCase {
     func testEvalBooleanExpression () {
         let tests = [(code:"true",expectedValue:true),
                      (code:"false",expectedValue:false),
+                     ]
+        
+        for test in tests {
+            let resultObj = evaluate(input: test.code)
+            validateBooleanObject(obj: resultObj, expect: test.expectedValue)
+        }
+    }
+    
+    func testBangOperator () {
+        let tests = [(code:"!true",expectedValue:false),
+                     (code:"!false",expectedValue:true),
+                     (code:"!5",expectedValue:false),
+                     (code:"!!true",expectedValue:true),
+                     (code:"!!false",expectedValue:false),
+                     (code:"!!5",expectedValue:true),
                      ]
         
         for test in tests {
