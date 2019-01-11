@@ -27,9 +27,10 @@ struct IntegerObj:Object {
     func inspect() -> String {
         return "\(value)"
     }
+    
 }
 
-struct BooleanObj:Object {
+struct BooleanObj:Object, Equatable {
     var value:Bool
     func type() -> ObjectType {
         return ObjectType.BOOLEAN
@@ -38,6 +39,10 @@ struct BooleanObj:Object {
     func inspect() -> String {
         return "\(value)"
     }
+    static func == (lhs: BooleanObj, rhs: BooleanObj) -> Bool {
+        return lhs.value == rhs.value
+    }
+
 }
 
 struct NullObj:Object {

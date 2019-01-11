@@ -55,8 +55,31 @@ class EvaluatorTests: XCTestCase {
     }
     
     func testEvalBooleanExpression () {
-        let tests = [(code:"true",expectedValue:true),
+        let tests = [
+                     (code:"true",expectedValue:true),
                      (code:"false",expectedValue:false),
+                     
+                     (code:"true == true",expectedValue:true),
+                     (code:"false == false",expectedValue:true),
+                     (code:"true == false",expectedValue:false),
+                     (code:"true != false",expectedValue:true),
+                     (code:"false != true",expectedValue:true),
+
+                     (code:"1 < 2",expectedValue:true),
+                     (code:"1 > 2",expectedValue:false),
+                     (code:"1 < 1",expectedValue:false),
+                     (code:"1 > 1",expectedValue:false),
+                     (code:"1 == 1",expectedValue:true),
+                     (code:"1 != 1",expectedValue:false),
+                     (code:"1 == 2",expectedValue:false),
+                     (code:"1 != 2",expectedValue:true),
+
+                     (code:"(1 < 2) == true",expectedValue:true),
+                     (code:"(1 < 2) == false",expectedValue:false),
+                     (code:"(1 > 2) == true",expectedValue:false),
+                     (code:"(1 > 2) == false",expectedValue:true),
+
+                     (code:"true == (1 < 2)",expectedValue:true),
                      ]
         
         for test in tests {

@@ -53,6 +53,18 @@ public struct Evaluator {
         if left.type() == ObjectType.INTEGER && right.type() == ObjectType.INTEGER {
             return evalIntegerExpression(oper: oper, left: left, right: right)
         }
+
+        if left.type() == ObjectType.BOOLEAN && right.type() == ObjectType.BOOLEAN {
+            let leftBool = left as! BooleanObj
+            let rightBool = right as! BooleanObj
+            if oper == "==" {
+                return leftBool.value == rightBool.value ? Evaluator.TRUE : Evaluator.FALSE
+            }
+            if oper == "!=" {
+                return leftBool.value != rightBool.value ? Evaluator.TRUE : Evaluator.FALSE
+            }
+        }
+
         return Evaluator.NULL
     }
 
@@ -80,6 +92,14 @@ public struct Evaluator {
             return IntegerObj(value: leftValue * rightValue)
         case "/" :
             return IntegerObj(value: leftValue / rightValue)
+        case "<" :
+            return leftValue < rightValue ? Evaluator.TRUE : Evaluator.FALSE
+        case ">" :
+            return leftValue > rightValue ? Evaluator.TRUE : Evaluator.FALSE
+        case "==" :
+            return leftValue == rightValue ? Evaluator.TRUE : Evaluator.FALSE
+        case "!=" :
+            return leftValue != rightValue ? Evaluator.TRUE : Evaluator.FALSE
         default:
             return Evaluator.NULL
         }
