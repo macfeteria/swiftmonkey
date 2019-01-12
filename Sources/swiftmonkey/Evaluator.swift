@@ -35,6 +35,12 @@ public struct Evaluator {
             let left = eval(node: infix.left)
             let right = eval(node: infix.right!)
             return evalInfixExpression(oper: infix.operatorLiteral, left: left, right: right)
+        case is BlockStatement:
+            let block = node as! BlockStatement
+            return eval(statements:block.statements)
+        case is IfExpression:
+            let ifEx = node as! IfExpression
+            return evalIfExpression(expression: ifEx)
         default:
             return Evaluator.NULL
         }
@@ -122,5 +128,29 @@ public struct Evaluator {
         default:
             return Evaluator.FALSE
         }
+    }
+    
+    func evalIfExpression(expression: IfExpression) -> Object {
+        let condition = eval(node: expression.condition)
+        if isTruthy(obj: condition) {
+            return eval(node: expression.consequence)
+        } else if let alter = expression.alternative {
+            return eval(node: alter)
+        } else {
+            return Evaluator.NULL
+        }
+    }
+    
+    func isTruthy(obj: Object) -> Bool {
+        if obj is NullObj {
+            return false
+        }
+        if let boolObj = obj as? BooleanObj {
+          return boolObj.value
+        }
+        if let intObj = obj as? IntegerObj {
+            return intObj.value != 0
+        }
+        return true
     }
 }

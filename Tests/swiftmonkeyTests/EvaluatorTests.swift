@@ -28,6 +28,11 @@ class EvaluatorTests: XCTestCase {
         let intObj = obj as! BooleanObj
         XCTAssertTrue(intObj.value == expect)
     }
+    
+    func validateNullObject(obj:Object) {
+        let nullObj = obj as? NullObj
+        XCTAssertNotNil(nullObj)
+    }
 
     func testEvalIntegerExpression () {
         let tests = [(code:"5",expectedValue:5),
@@ -85,6 +90,26 @@ class EvaluatorTests: XCTestCase {
         for test in tests {
             let resultObj = evaluate(input: test.code)
             validateBooleanObject(obj: resultObj, expect: test.expectedValue)
+        }
+    }
+    
+    func testIfExpression () {
+        let tests = [
+                     (code:"if (true) { 10 }",expectedValue: 10),
+                     (code:"if (false) { 10 }",expectedValue: nil),
+                     (code:"if (1) { 10 }",expectedValue: 10),
+                     (code:"if (1 < 2) { 10 }",expectedValue: 10),
+                     (code:"if (1 > 2) { 10 }",expectedValue: nil),
+                     (code:"if (1 > 2) { 10 } else { 20 }",expectedValue: 20),
+                     (code:"if (1 < 2) { 10 } else { 20 }",expectedValue: 10),
+                     ]
+        for test in tests {
+            let resultObj = evaluate(input: test.code)
+            if let value = test.expectedValue {
+                validateIntegerObject(obj: resultObj, expect: value)
+            } else {
+                validateNullObject(obj: resultObj)
+            }
         }
     }
     
