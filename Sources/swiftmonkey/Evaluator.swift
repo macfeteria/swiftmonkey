@@ -16,7 +16,7 @@ public struct Evaluator {
         switch node {
         case is Program:
             let program = node as! Program
-            return eval(statements: program.statements)
+            return eval(program: program)
         case is ExpressionStatement:
             let ex = node as! ExpressionStatement
             return eval(node: ex.expression!)
@@ -37,23 +37,49 @@ public struct Evaluator {
             return evalInfixExpression(oper: infix.operatorLiteral, left: left, right: right)
         case is BlockStatement:
             let block = node as! BlockStatement
-            return eval(statements:block.statements)
+            return evalBlockStatement(block: block)
         case is IfExpression:
             let ifEx = node as! IfExpression
             return evalIfExpression(expression: ifEx)
+        case is ReturnStatement:
+            let returnStmt = node as! ReturnStatement
+            let value = eval(node:returnStmt.returnValue!)
+            return ReturnValueObj(value: value)
         default:
             return Evaluator.NULL
         }
     }
     
-    
-    func eval(statements:[Statement]) -> Object {
+    func eval(program:Program) -> Object {
         var result: Object = NullObj()
-        for s in statements {
+        for s in program.statements {
             result = eval(node: s)
+            if let returnValue = result as? ReturnValueObj {
+                return returnValue.value
+            }
         }
         return result
     }
+    
+    func evalBlockStatement(block: BlockStatement) -> Object {
+        var result: Object = NullObj()
+        for s in block.statements {
+            result = eval(node: s)
+            let type = result.type()
+            if type != ObjectType.NULL && type == ObjectType.RETURN_VALUE {
+                return result
+            }
+        }
+        return result
+    }
+    
+//    func eval(statements:[Statement]) -> Object {
+//        var result: Object = NullObj()
+//        for s in statements {
+//            result = eval(node: s)
+//        }
+//        return result
+//    }
     
     func evalInfixExpression(oper: String, left:Object, right: Object) -> Object {
         if left.type() == ObjectType.INTEGER && right.type() == ObjectType.INTEGER {

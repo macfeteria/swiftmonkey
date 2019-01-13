@@ -127,6 +127,27 @@ class EvaluatorTests: XCTestCase {
             validateBooleanObject(obj: resultObj, expect: test.expectedValue)
         }
     }
+    
+    func testReturnStatement () {
+        let tests = [
+                    (code:"return 10;", expectedValue:10),
+                    (code:"return 10; 9;", expectedValue:10),
+                    (code:"return 2 * 5; 9;", expectedValue:10),
+                    (code:"9; return 2 * 5; 8;", expectedValue:10),
+                    (code:"""
+                        if ( 10 > 1 ) {
+                            if ( 10 > 1 ) {
+                                return 10;
+                            }
+                            return 1;
+                        }
+                        """, expectedValue: 10),
+                    ]
+        for test in tests {
+            let resultObj = evaluate(input: test.code)
+            validateIntegerObject(obj: resultObj, expect: test.expectedValue)
+        }
+    }
 
 
 }

@@ -10,6 +10,7 @@ import Foundation
 public enum ObjectType {
     case INTEGER
     case BOOLEAN
+    case RETURN_VALUE
     case NULL
 }
 
@@ -42,7 +43,17 @@ struct BooleanObj:Object, Equatable {
     static func == (lhs: BooleanObj, rhs: BooleanObj) -> Bool {
         return lhs.value == rhs.value
     }
+}
 
+struct ReturnValueObj:Object {
+    var value:Object
+    func type() -> ObjectType {
+        return ObjectType.RETURN_VALUE
+    }
+    
+    func inspect() -> String {
+        return "\(value.inspect())"
+    }    
 }
 
 struct NullObj:Object {
