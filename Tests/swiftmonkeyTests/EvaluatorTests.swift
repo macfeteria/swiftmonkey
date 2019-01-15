@@ -16,8 +16,8 @@ class EvaluatorTests: XCTestCase {
         
         let program = parser.parseProgram()
         let evaluated = Evaluator()
-        var env = Environment()
-        return evaluated.eval(program: program, environment: &env)
+        let env = Environment()
+        return evaluated.eval(program: program, environment: env)
     }
     
     func validateIntegerObject(obj:Object, expect: Int) {
@@ -185,6 +185,44 @@ class EvaluatorTests: XCTestCase {
             let resultObj = evaluate(input: test.code)
             validateIntegerObject(obj: resultObj, expect: test.expectedValue)
         }
+    }
+    
+    func testFunctionObject () {
+        let code = "fn(x) { x + 2; };"
+        
+        let obj = evaluate(input: code)
+        let funcObj = obj as! FunctionObj
+        XCTAssertTrue(funcObj.parameters.count == 1)
+        XCTAssertTrue(funcObj.parameters[0].string() == "x",  "got \(funcObj.parameters[0].string())")
+        XCTAssertTrue(funcObj.body.string() == "(x + 2)", "got \(funcObj.body.string())")
+    }
+    
+    func testFunctionApplication () {
+        
+        let tests = [
+            (code:"let identity = fn(x) { x; }; identity(5);", expectedValue: 5),
+            (code:"let double = fn(x) { return x * 2; }; double(5);", expectedValue: 10),
+            (code:"let add = fn(x, y) { x + y; }; add(5, 5);", expectedValue: 10),
+            (code:"let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", expectedValue: 20),
+            ]
+        for test in tests {
+            let resultObj = evaluate(input: test.code)
+            validateIntegerObject(obj: resultObj, expect: test.expectedValue)
+        }
+        
+    }
+    
+    func testClosure() {
+        let code = """
+            let newAdder = fn(x) {
+                fn(y) { x + y };
+            };
+            let addTwo = newAdder(2)
+            addTwo(2);
+        """
+        
+        let resultObj = evaluate(input: code)
+        validateIntegerObject(obj: resultObj, expect: 4)
     }
 
 }

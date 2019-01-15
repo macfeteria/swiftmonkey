@@ -13,6 +13,7 @@ public enum ObjectType {
     case RETURN_VALUE
     case NULL
     case ERROR
+    case FUNCTION
 }
 
 public protocol Object {
@@ -74,5 +75,27 @@ struct ErrorObj:Object {
     
     func inspect() -> String {
         return "\(message)"
+    }
+}
+
+struct FunctionObj:Object {
+    var parameters:[Identifier]
+    var body:BlockStatement
+    var env:Environment
+
+    func type() -> ObjectType {
+        return ObjectType.FUNCTION
+    }
+    
+    func inspect() -> String {
+        let param = parameters.map { (iden) -> String in
+            return iden.value
+        }.joined(separator: ",")
+        
+        return """
+        fn(\(param)) {
+        \(body.string())
+        }
+        """
     }
 }

@@ -57,9 +57,63 @@ public struct Evaluator {
         case is Identifier:
             let iden = node as! Identifier
             return evalIdentifier(node: iden, environment: env)
+        case is FunctionLiteral:
+            let funcLit = node as! FunctionLiteral
+            let params = funcLit.parameters
+            let body = funcLit.body
+            return FunctionObj(parameters: params, body: body, env: env)
+        case is CallExpression:
+            let call = node as! CallExpression
+            let function = eval(node: call.function, environment: env)
+            if isError(obj: function) {
+                return function
+            }
+            let args = evalExpression(args: call.arguments, environment: env)
+            if args.count == 1 && isError(obj: args[0]) {
+                return args[0]
+            }
+            return applyFunction(fn: function, args: args)
         default:
             return Evaluator.NULL
         }
+    }
+    
+    func applyFunction(fn: Object, args: [Object]) -> Object {
+        if let function = fn as? FunctionObj {
+            let extendedEnv = extendedFunctionEnv(fn: function, args: args)
+            let evaluated = eval(node: function.body, environment: extendedEnv)
+            return unwrapReturnValue(obj: evaluated)
+        }
+        return ErrorObj(message:"not a function: \(fn.type())")
+    }
+    
+    func unwrapReturnValue(obj: Object) -> Object {
+        if let returnValue = obj as? ReturnValueObj {
+            return returnValue.value
+        }
+        return obj
+    }
+    
+    func extendedFunctionEnv(fn: FunctionObj, args: [Object]) -> Environment {
+        let env = Environment()
+        env.outer = fn.env
+        let param = fn.parameters
+        for i in 0 ..< param.count {
+            env.set(name: param[i].value, object: args[i])
+        }
+        return env
+    }
+    
+    func evalExpression(args: [Expression], environment env: Environment) -> [Object] {
+        var result:[Object] = []
+        for a in args {
+            let evaluated = eval(node: a, environment: env)
+            if isError(obj: evaluated) {
+                return [evaluated]
+            }
+            result.append(evaluated)
+        }
+        return result
     }
     
     func evalIdentifier(node: Identifier, environment env: Environment) -> Object {
