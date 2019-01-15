@@ -29,11 +29,14 @@ public struct Evaluator {
         case is PrefixExpression:
             let pre = node as! PrefixExpression
             let right = eval(node: pre.right!)
+            if isError(obj: right) { return right }
             return evalPrefixExpression(oper: pre.operatorLiteral, right: right)
         case is InfixExpression:
             let infix = node as! InfixExpression
             let left = eval(node: infix.left)
+            if isError(obj: left) { return left }
             let right = eval(node: infix.right!)
+            if isError(obj: right) { return right }
             return evalInfixExpression(oper: infix.operatorLiteral, left: left, right: right)
         case is BlockStatement:
             let block = node as! BlockStatement
@@ -44,6 +47,7 @@ public struct Evaluator {
         case is ReturnStatement:
             let returnStmt = node as! ReturnStatement
             let value = eval(node:returnStmt.returnValue!)
+            if isError(obj: value) { return value }
             return ReturnValueObj(value: value)
         default:
             return Evaluator.NULL
@@ -57,6 +61,9 @@ public struct Evaluator {
             if let returnValue = result as? ReturnValueObj {
                 return returnValue.value
             }
+            if let error = result as? ErrorObj {
+                return error
+            }
         }
         return result
     }
@@ -66,20 +73,12 @@ public struct Evaluator {
         for s in block.statements {
             result = eval(node: s)
             let type = result.type()
-            if type != ObjectType.NULL && type == ObjectType.RETURN_VALUE {
+            if type == ObjectType.ERROR || type == ObjectType.RETURN_VALUE {
                 return result
             }
         }
         return result
     }
-    
-//    func eval(statements:[Statement]) -> Object {
-//        var result: Object = NullObj()
-//        for s in statements {
-//            result = eval(node: s)
-//        }
-//        return result
-//    }
     
     func evalInfixExpression(oper: String, left:Object, right: Object) -> Object {
         if left.type() == ObjectType.INTEGER && right.type() == ObjectType.INTEGER {
@@ -96,8 +95,11 @@ public struct Evaluator {
                 return leftBool.value != rightBool.value ? Evaluator.TRUE : Evaluator.FALSE
             }
         }
+        if left.type() != right.type() {
+            return ErrorObj(message: "type mismatch: \(left.type()) \(oper) \(right.type())")
+        }
 
-        return Evaluator.NULL
+        return ErrorObj(message: "unknow operator: \(left.type()) \(oper) \(right.type())")
     }
 
     
@@ -108,7 +110,7 @@ public struct Evaluator {
         case "-" :
             return evalMinusPrefixOperator(right: right)
         default:
-            return Evaluator.NULL
+            return ErrorObj(message: "unknow operator: \(oper) \(right.type())")
         }
     }
 
@@ -133,12 +135,12 @@ public struct Evaluator {
         case "!=" :
             return leftValue != rightValue ? Evaluator.TRUE : Evaluator.FALSE
         default:
-            return Evaluator.NULL
+            return ErrorObj(message: "unknow operator: \(left.type()) \(oper) \(right.type())")
         }
     }
     func evalMinusPrefixOperator(right: Object) -> Object {
         if right.type() != ObjectType.INTEGER {
-            return Evaluator.NULL
+            return ErrorObj(message: "unknow operator: -\(right.type())")
         }
         let intObj = right as! IntegerObj
         return IntegerObj(value: -intObj.value)
@@ -158,6 +160,7 @@ public struct Evaluator {
     
     func evalIfExpression(expression: IfExpression) -> Object {
         let condition = eval(node: expression.condition)
+        if isError(obj: condition) { return condition }
         if isTruthy(obj: condition) {
             return eval(node: expression.consequence)
         } else if let alter = expression.alternative {
@@ -178,5 +181,9 @@ public struct Evaluator {
             return intObj.value != 0
         }
         return true
+    }
+    
+    func isError(obj: Object) -> Bool {
+        return obj.type() == ObjectType.ERROR
     }
 }

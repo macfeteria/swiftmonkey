@@ -12,6 +12,7 @@ public enum ObjectType {
     case BOOLEAN
     case RETURN_VALUE
     case NULL
+    case ERROR
 }
 
 public protocol Object {
@@ -28,7 +29,6 @@ struct IntegerObj:Object {
     func inspect() -> String {
         return "\(value)"
     }
-    
 }
 
 struct BooleanObj:Object, Equatable {
@@ -63,5 +63,16 @@ struct NullObj:Object {
     
     func inspect() -> String {
         return "null"
+    }
+}
+
+struct ErrorObj:Object {
+    var message:String
+    func type() -> ObjectType {
+        return ObjectType.ERROR
+    }
+    
+    func inspect() -> String {
+        return "\(message)"
     }
 }

@@ -33,23 +33,23 @@ class ParserTests: XCTestCase {
     }
     
     func validateInteger(integerLiteral: IntegerLiteral, result: Int ) {
-        XCTAssertTrue(integerLiteral.value == result)
-        XCTAssertTrue(integerLiteral.tokenLiteral() == "\(result)")
+        XCTAssertTrue(integerLiteral.value == result, "Expect \(integerLiteral.value) Got \(result)")
+        XCTAssertTrue(integerLiteral.tokenLiteral() == "\(result)", "Expect \(integerLiteral.tokenLiteral()) Got \(result)")
     }
     
     func validateIdentifier(identifier: Identifier, result: String ) {
-        XCTAssertTrue(identifier.value == result)
-        XCTAssertTrue(identifier.tokenLiteral() == result)
+        XCTAssertTrue(identifier.value == result, "Expect \(identifier.value) Got \(result)")
+        XCTAssertTrue(identifier.tokenLiteral() == result, "Expect \(identifier.tokenLiteral()) Got \(result)")
     }
     
     func validateBoolean(boolean: Boolean, result: Bool) {
         XCTAssertTrue(boolean.value == result)
-        XCTAssertTrue(boolean.tokenLiteral() == String(result))
+        XCTAssertTrue(boolean.tokenLiteral() == String(result), "Expect \(boolean.tokenLiteral()) Got \(result)")
     }
 
     func validateInfix<T>(infix: InfixExpression, left: T, op: String, right: T) {
         validateLiteralExpression(expression: infix, result: left)
-        XCTAssertTrue(infix.operatorLiteral == op)
+        XCTAssertTrue(infix.operatorLiteral == op, "Expect \(infix.operatorLiteral) Got \(op)")
         validateLiteralExpression(expression: infix, result: right)
     }
     
@@ -62,7 +62,7 @@ class ParserTests: XCTestCase {
         for e in parser.errors {
             print(e)
         }
-        XCTAssertTrue(parser.errors.count == 0)
+        XCTAssertTrue(parser.errors.count == 0,  "Expect no error")
     }
     
     func testLetStatement() {
@@ -85,8 +85,8 @@ class ParserTests: XCTestCase {
             validateParserError(parser: parser)
             
             let letStatement = program.statements[0] as! LetStatement
-            XCTAssertTrue(letStatement.name.tokenLiteral() == test.expectedIdentifier)
-            XCTAssertTrue(letStatement.name.value  == test.expectedIdentifier)
+            XCTAssertTrue(letStatement.name.tokenLiteral() == test.expectedIdentifier, "Expect \(test.expectedIdentifier) Got \(letStatement.name.tokenLiteral())")
+            XCTAssertTrue(letStatement.name.value  == test.expectedIdentifier, "Expect \(test.expectedIdentifier) Got \(letStatement.name.value)")
             
             validateLiteralExpression(expression: letStatement.value, result: test.expectedValue)
         }
@@ -103,7 +103,7 @@ class ParserTests: XCTestCase {
         let lexer = Lexer(input: code)
         let parser = Parser(lexer: lexer)
         let _ = parser.parseProgram()
-        XCTAssertTrue(parser.errors.count != 0)
+        XCTAssertTrue(parser.errors.count != 0, "Expect no error")
     }
     
     
@@ -175,8 +175,8 @@ class ParserTests: XCTestCase {
             XCTAssertTrue(expression.operatorLiteral == test.oper)
 
             let integerLit = expression.right as! IntegerLiteral
-            XCTAssertTrue(integerLit.value == test.intValue)
-            XCTAssertTrue(integerLit.tokenLiteral() == "\(test.intValue)")
+            XCTAssertTrue(integerLit.value == test.intValue, "Expect \(test.intValue) Got \(integerLit.value)")
+            XCTAssertTrue(integerLit.tokenLiteral() == "\(test.intValue)", "Expect \(test.intValue) Got \(integerLit.tokenLiteral())")
         }
     }
 
@@ -197,9 +197,9 @@ class ParserTests: XCTestCase {
             
             XCTAssertTrue(expression.operatorLiteral == test.oper)
             
-            let integerLit = expression.right as! Boolean
-            XCTAssertTrue(integerLit.value == test.value)
-            XCTAssertTrue(integerLit.tokenLiteral() == "\(test.value)")
+            let boolLit = expression.right as! Boolean
+            XCTAssertTrue(boolLit.value == test.value, "Expect \(test.value) Got \(boolLit.value)")
+            XCTAssertTrue(boolLit.tokenLiteral() == "\(test.value)", "Expect \(test.value) Got \(boolLit.tokenLiteral())")
         }
     }
 
@@ -278,7 +278,7 @@ class ParserTests: XCTestCase {
             let program = parser.parseProgram()
             validateParserError(parser: parser)
             let result = program.string()
-            XCTAssertTrue(result == test.expected)
+            XCTAssertTrue(result == test.expected , "Expect \(test.expected) Got \(result)" )
         }
     }
     

@@ -21,12 +21,12 @@ class EvaluatorTests: XCTestCase {
     
     func validateIntegerObject(obj:Object, expect: Int) {
         let intObj = obj as! IntegerObj
-        XCTAssertTrue(intObj.value == expect)
+        XCTAssertTrue(intObj.value == expect, "Expect \(expect) Got \(intObj.value)")
     }
     
     func validateBooleanObject(obj:Object, expect: Bool) {
-        let intObj = obj as! BooleanObj
-        XCTAssertTrue(intObj.value == expect)
+        let boolObj = obj as! BooleanObj
+        XCTAssertTrue(boolObj.value == expect,"Expect \(expect) Got \(boolObj.value)")
     }
     
     func validateNullObject(obj:Object) {
@@ -149,5 +149,27 @@ class EvaluatorTests: XCTestCase {
         }
     }
 
+    func testErrorHandling () {
+        let tests = [
+            (code:"5 + true;", expectedValue:"type mismatch: INTEGER + BOOLEAN"),
+            (code:"5 + true; 5;", expectedValue:"type mismatch: INTEGER + BOOLEAN"),
+            (code:"-true;", expectedValue:"unknow operator: -BOOLEAN"),
+            (code:"true + false;", expectedValue:"unknow operator: BOOLEAN + BOOLEAN"),
+            (code:"5; true + false; 5", expectedValue:"unknow operator: BOOLEAN + BOOLEAN"),
+            (code:"if (10 > 1) { true + false; }", expectedValue:"unknow operator: BOOLEAN + BOOLEAN"),
+            (code:"""
+                if ( 10 > 1 ) {
+                    if ( 10 > 1 ) {
+                        return true + false;
+                    }
+                    return 1;
+                }
+                """, expectedValue:"unknow operator: BOOLEAN + BOOLEAN"),
+        ]
+        for test in tests {
+            let resultObj = evaluate(input: test.code)
+            XCTAssertTrue(resultObj.inspect() == test.expectedValue, "Expect \(test.expectedValue) Got \(resultObj.inspect())" )
+        }
+    }
 
 }
