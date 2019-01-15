@@ -16,7 +16,8 @@ class EvaluatorTests: XCTestCase {
         
         let program = parser.parseProgram()
         let evaluated = Evaluator()
-        return evaluated.eval(node: program)
+        var env = Environment()
+        return evaluated.eval(program: program, environment: &env)
     }
     
     func validateIntegerObject(obj:Object, expect: Int) {
@@ -165,10 +166,24 @@ class EvaluatorTests: XCTestCase {
                     return 1;
                 }
                 """, expectedValue:"unknow operator: BOOLEAN + BOOLEAN"),
+            (code:"foobar", expectedValue:"identifier not found: foobar"),
         ]
         for test in tests {
             let resultObj = evaluate(input: test.code)
             XCTAssertTrue(resultObj.inspect() == test.expectedValue, "Expect \(test.expectedValue) Got \(resultObj.inspect())" )
+        }
+    }
+    
+    func testLetStatement () {
+        let tests = [
+            (code:"let a = 5; a;", expectedValue: 5),
+            (code:"let a = 5 * 5; a;", expectedValue: 25),
+            (code:"let a = 5; let b = a; b;", expectedValue: 5),
+            (code:"let a = 5; let b = a; let c = a + b + 5; c;", expectedValue: 15),
+            ]
+        for test in tests {
+            let resultObj = evaluate(input: test.code)
+            validateIntegerObject(obj: resultObj, expect: test.expectedValue)
         }
     }
 

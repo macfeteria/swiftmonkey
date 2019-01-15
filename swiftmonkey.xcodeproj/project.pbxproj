@@ -23,6 +23,7 @@
 /* Begin PBXBuildFile section */
 		D758037621DE0EAD00CB65F6 /* ParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D758037521DE0EAD00CB65F6 /* ParserTests.swift */; };
 		D758037821DF5C6800CB65F6 /* AstTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D758037721DF5C6800CB65F6 /* AstTests.swift */; };
+		D76CF05521EDCA0A00D00C83 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76CF05421EDCA0A00D00C83 /* Environment.swift */; };
 		D772149021DCB627007BAA3B /* Repl.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772148F21DCB627007BAA3B /* Repl.swift */; };
 		D772149221DDFB3F007BAA3B /* Ast.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772149121DDFB3F007BAA3B /* Ast.swift */; };
 		D772149421DDFE0D007BAA3B /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772149321DDFE0D007BAA3B /* Parser.swift */; };
@@ -66,6 +67,7 @@
 /* Begin PBXFileReference section */
 		D758037521DE0EAD00CB65F6 /* ParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParserTests.swift; sourceTree = "<group>"; };
 		D758037721DF5C6800CB65F6 /* AstTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AstTests.swift; sourceTree = "<group>"; };
+		D76CF05421EDCA0A00D00C83 /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		D772148F21DCB627007BAA3B /* Repl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Repl.swift; sourceTree = "<group>"; };
 		D772149121DDFB3F007BAA3B /* Ast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ast.swift; sourceTree = "<group>"; };
 		D772149321DDFE0D007BAA3B /* Parser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 				D772149321DDFE0D007BAA3B /* Parser.swift */,
 				D7E3A04821E73272006D19CE /* Object.swift */,
 				D7E3A04A21E73831006D19CE /* Evaluator.swift */,
+				D76CF05421EDCA0A00D00C83 /* Environment.swift */,
 			);
 			name = swiftmonkey;
 			path = Sources/swiftmonkey;
@@ -286,6 +289,7 @@
 			buildActionMask = 0;
 			files = (
 				D772149221DDFB3F007BAA3B /* Ast.swift in Sources */,
+				D76CF05521EDCA0A00D00C83 /* Environment.swift in Sources */,
 				D7E3A04B21E73831006D19CE /* Evaluator.swift in Sources */,
 				D772149021DCB627007BAA3B /* Repl.swift in Sources */,
 				D772149421DDFE0D007BAA3B /* Parser.swift in Sources */,

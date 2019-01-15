@@ -12,14 +12,14 @@ public struct Evaluator {
     static let FALSE = BooleanObj(value: false)
     static let NULL = NullObj()
 
-    public func eval(node: Node) -> Object {
+    public func eval(node: Node, environment env: Environment) -> Object {
         switch node {
         case is Program:
             let program = node as! Program
-            return eval(program: program)
+            return eval(program: program, environment: env)
         case is ExpressionStatement:
             let ex = node as! ExpressionStatement
-            return eval(node: ex.expression!)
+            return eval(node: ex.expression!, environment: env)
         case is IntegerLiteral:
             let int = node as! IntegerLiteral
             return IntegerObj(value: int.value)
@@ -28,36 +28,52 @@ public struct Evaluator {
             return boolean.value ? Evaluator.TRUE : Evaluator.FALSE
         case is PrefixExpression:
             let pre = node as! PrefixExpression
-            let right = eval(node: pre.right!)
+            let right = eval(node: pre.right!, environment: env)
             if isError(obj: right) { return right }
             return evalPrefixExpression(oper: pre.operatorLiteral, right: right)
         case is InfixExpression:
             let infix = node as! InfixExpression
-            let left = eval(node: infix.left)
+            let left = eval(node: infix.left, environment: env)
             if isError(obj: left) { return left }
-            let right = eval(node: infix.right!)
+            let right = eval(node: infix.right!, environment: env)
             if isError(obj: right) { return right }
             return evalInfixExpression(oper: infix.operatorLiteral, left: left, right: right)
         case is BlockStatement:
             let block = node as! BlockStatement
-            return evalBlockStatement(block: block)
+            return evalBlockStatement(block: block, environment: env)
         case is IfExpression:
             let ifEx = node as! IfExpression
-            return evalIfExpression(expression: ifEx)
+            return evalIfExpression(expression: ifEx, environment: env)
         case is ReturnStatement:
             let returnStmt = node as! ReturnStatement
-            let value = eval(node:returnStmt.returnValue!)
+            let value = eval(node:returnStmt.returnValue!, environment: env)
             if isError(obj: value) { return value }
             return ReturnValueObj(value: value)
+        case is LetStatement:
+            let letStmt = node as! LetStatement
+            let value = eval(node: letStmt.value!, environment: env)
+            if isError(obj: value) { return value }
+            return env.set(name: letStmt.name.value, object: value)
+        case is Identifier:
+            let iden = node as! Identifier
+            return evalIdentifier(node: iden, environment: env)
         default:
             return Evaluator.NULL
         }
     }
     
-    func eval(program:Program) -> Object {
+    func evalIdentifier(node: Identifier, environment env: Environment) -> Object {
+        let (iden,ok) = env.get(name: node.value)
+        if !ok {
+            return ErrorObj(message: "identifier not found: \(node.value)")
+        }
+        return iden
+    }
+    
+    func eval(program:Program, environment env: Environment) -> Object {
         var result: Object = NullObj()
         for s in program.statements {
-            result = eval(node: s)
+            result = eval(node: s, environment: env)
             if let returnValue = result as? ReturnValueObj {
                 return returnValue.value
             }
@@ -68,10 +84,10 @@ public struct Evaluator {
         return result
     }
     
-    func evalBlockStatement(block: BlockStatement) -> Object {
+    func evalBlockStatement(block: BlockStatement, environment env: Environment) -> Object {
         var result: Object = NullObj()
         for s in block.statements {
-            result = eval(node: s)
+            result = eval(node: s, environment: env)
             let type = result.type()
             if type == ObjectType.ERROR || type == ObjectType.RETURN_VALUE {
                 return result
@@ -158,13 +174,13 @@ public struct Evaluator {
         }
     }
     
-    func evalIfExpression(expression: IfExpression) -> Object {
-        let condition = eval(node: expression.condition)
+    func evalIfExpression(expression: IfExpression, environment env: Environment) -> Object {
+        let condition = eval(node: expression.condition, environment: env)
         if isError(obj: condition) { return condition }
         if isTruthy(obj: condition) {
-            return eval(node: expression.consequence)
+            return eval(node: expression.consequence, environment: env)
         } else if let alter = expression.alternative {
-            return eval(node: alter)
+            return eval(node: alter, environment: env)
         } else {
             return Evaluator.NULL
         }
