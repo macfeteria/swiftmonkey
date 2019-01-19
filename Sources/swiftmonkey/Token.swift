@@ -39,6 +39,7 @@ public enum TokenType:String {
     case IF       = "IF"
     case ELSE     = "ELSE"
     case RETURN   = "RETURN"
+    case STRING   = "STRING"
 }
 
 public struct Token {

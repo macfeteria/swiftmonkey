@@ -14,6 +14,7 @@ public enum ObjectType {
     case NULL
     case ERROR
     case FUNCTION
+    case STRING
 }
 
 public protocol Object {
@@ -97,5 +98,17 @@ struct FunctionObj:Object {
         \(body.string())
         }
         """
+    }
+}
+
+
+struct StringObj:Object {
+    var value:String
+    func type() -> ObjectType {
+        return ObjectType.STRING
+    }
+    
+    func inspect() -> String {
+        return value
     }
 }

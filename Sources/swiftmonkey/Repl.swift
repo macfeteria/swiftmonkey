@@ -16,12 +16,8 @@ public func startRepl () {
 
     repeat {
         print(PROMPT,terminator:"")
-        input = readLine()
-        if let code = input , code.count > 0{
-//            if code != code.alphanumeric {
-//                print("\t Code contains special character")
-//                continue
-//            }
+        input = readLine(strippingNewline:false)
+        if let code = input , code.count > 0 {
             let lexer = Lexer(input: code + "\0")
             let parser = Parser(lexer: lexer)
             let program = parser.parseProgram()
@@ -32,14 +28,10 @@ public func startRepl () {
             } else {
                 let evaluated = Evaluator()
                 let result = evaluated.eval(program: program, environment: env)
-                print(result.inspect())
+                if result.type() != ObjectType.NULL {
+                    print(result.inspect())
+                }
             }
         }
     } while (input != nil)
-}
-
-extension String {
-    var alphanumeric: String {
-        return self.components(separatedBy: CharacterSet.alphanumerics.inverted).joined().lowercased()
-    }
 }

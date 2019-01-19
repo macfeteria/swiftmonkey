@@ -71,6 +71,7 @@ public class Parser {
         registerPrefix(type: TokenType.IF, function: parseIfExpression)
 
         registerPrefix(type: TokenType.FUNCTION, function: parseFunctionLiteral)
+        registerPrefix(type: TokenType.STRING, function: parseStringLiteral)
 
         registerInfix(type: TokenType.PLUS, function: parseInfixExpression)
         registerInfix(type: TokenType.MINUS, function: parseInfixExpression)
@@ -211,6 +212,10 @@ public class Parser {
     
     func parseBoolean() -> Expression {
         return Boolean(token: curToken, value: isCurrentTokenType(type: TokenType.TRUE))
+    }
+    
+    func parseStringLiteral() -> Expression {
+        return StringLiteral(token: curToken, value: curToken.literal)
     }
     
     func parseIntegerLiteral() -> Expression {

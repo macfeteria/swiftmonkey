@@ -47,6 +47,24 @@ class LexerTests: XCTestCase {
         }
     }
     
+    func testStringToken() {
+        let code = """
+        "foobar"
+        "foo bar"
+        """
+        let expectResult = [
+            Token(tokenType: TokenType.STRING, literal: "foobar"),
+            Token(tokenType: TokenType.STRING, literal: "foo bar"),
+            ]
+        
+        let lexer = Lexer(input: code)
+        for i in expectResult {
+            let tok = lexer.nextToken()
+            XCTAssert(tok.tokenType == i.tokenType, "Failed Type: \(tok.tokenType.rawValue )")
+            XCTAssert(tok.literal == i.literal, "Failed Literal: \(tok.literal)")
+        }
+    }
+    
     func testComplexCode() {
         let code = """
             let five = 5;

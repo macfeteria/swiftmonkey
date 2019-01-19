@@ -288,3 +288,18 @@ struct CallExpression: Expression {
         return result
     }
 }
+
+struct StringLiteral: Expression {
+    var token:Token
+    var value:String
+    func expressionNode() {
+    }
+    
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+    
+    func string() -> String {
+        return token.literal
+    }
+}

@@ -21,10 +21,8 @@ public class Environment {
         return (Evaluator.NULL, false)
     }
 
-    @discardableResult
-    func set(name:String, object:Object) -> Object {
+    func set(name:String, object:Object) {
         store[name] = object
-        return object
     }
 }
 

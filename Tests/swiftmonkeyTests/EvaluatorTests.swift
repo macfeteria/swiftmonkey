@@ -20,6 +20,11 @@ class EvaluatorTests: XCTestCase {
         return evaluated.eval(program: program, environment: env)
     }
     
+    func validateStringObject(obj:Object, expect: String) {
+        let strObj = obj as! StringObj
+        XCTAssertTrue(strObj.value == expect, "Expect \(expect) Got \(strObj.value)")
+    }
+    
     func validateIntegerObject(obj:Object, expect: Int) {
         let intObj = obj as! IntegerObj
         XCTAssertTrue(intObj.value == expect, "Expect \(expect) Got \(intObj.value)")
@@ -223,6 +228,12 @@ class EvaluatorTests: XCTestCase {
         
         let resultObj = evaluate(input: code)
         validateIntegerObject(obj: resultObj, expect: 4)
+    }
+    
+    func testStringLiteral() {
+        let code = "\"Hello\""
+        let resultObj = evaluate(input: code)
+        validateStringObject(obj: resultObj, expect: "Hello")
     }
 
 }

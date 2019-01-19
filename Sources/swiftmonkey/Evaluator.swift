@@ -53,7 +53,7 @@ public struct Evaluator {
             let letStmt = node as! LetStatement
             let value = eval(node: letStmt.value!, environment: env)
             if isError(obj: value) { return value }
-            return env.set(name: letStmt.name.value, object: value)
+            env.set(name: letStmt.name.value, object: value)
         case is Identifier:
             let iden = node as! Identifier
             return evalIdentifier(node: iden, environment: env)
@@ -73,9 +73,13 @@ public struct Evaluator {
                 return args[0]
             }
             return applyFunction(fn: function, args: args)
+        case is StringLiteral:
+            let str = node as! StringLiteral
+            return StringObj(value: str.value)
         default:
             return Evaluator.NULL
         }
+        return Evaluator.NULL
     }
     
     func applyFunction(fn: Object, args: [Object]) -> Object {

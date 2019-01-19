@@ -65,6 +65,9 @@ public class Lexer {
             case "{": tok = Token(tokenType: TokenType.LBRACE, literal: String(ch))
             case "}": tok = Token(tokenType: TokenType.RBRACE, literal: String(ch))
             case "\0": tok = Token(tokenType: TokenType.EOF, literal: String(ch))
+            case "\"":
+                let lit = readString()
+                return Token(tokenType: TokenType.STRING, literal: lit)
             default:
                 if isLetter(char:ch) {
                     let lit = readIdentifier()
@@ -88,6 +91,21 @@ public class Lexer {
             readChar()
         }
         return iden
+    }
+    
+    func readString() -> String {
+        var text = ""
+        while (true) {
+            readChar()
+            if ch == "\"" || ch == "\0" {
+                readChar()
+                break
+            } else {
+                text.append(ch)
+            }
+        }
+        
+        return text
     }
     
     
