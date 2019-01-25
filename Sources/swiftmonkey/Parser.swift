@@ -18,6 +18,7 @@ enum OperatorOrder:Int {
     case PRODUCT // *
     case PREFIX // -X or !X
     case CALL // myFunc(X)
+    case INDEX // myArray[index]
 }
 
 var precedences:[TokenType:OperatorOrder] = [.EQUAL: .EQUALS,
@@ -28,7 +29,8 @@ var precedences:[TokenType:OperatorOrder] = [.EQUAL: .EQUALS,
                                              .MINUS: .SUM,
                                              .SLASH: .PRODUCT,
                                              .ASTERISK: .PRODUCT,
-                                             .LPAREN: .CALL,]
+                                             .LPAREN: .CALL,
+                                             .LBRACKET: .INDEX,]
 
 public class Parser {
     let lexer:Lexer
@@ -73,6 +75,8 @@ public class Parser {
         registerPrefix(type: TokenType.FUNCTION, function: parseFunctionLiteral)
         registerPrefix(type: TokenType.STRING, function: parseStringLiteral)
 
+        registerPrefix(type: TokenType.LBRACKET, function: parseArrayLiteral)
+        
         registerInfix(type: TokenType.PLUS, function: parseInfixExpression)
         registerInfix(type: TokenType.MINUS, function: parseInfixExpression)
         registerInfix(type: TokenType.SLASH, function: parseInfixExpression)
@@ -83,6 +87,7 @@ public class Parser {
         registerInfix(type: TokenType.GREATER, function: parseInfixExpression)
 
         registerInfix(type: TokenType.LPAREN, function: parseCallExpression)
+        registerInfix(type: TokenType.LBRACKET, function: parseIndexExpression)
 
     }
     
@@ -343,7 +348,7 @@ public class Parser {
     
     func parseCallExpression(function: Expression) -> Expression {
         let token = curToken
-        let args = parseCallArguments()
+        let args = parseExpressionList(end: TokenType.RPAREN)//parseCallArguments()
         return CallExpression(token: token, function: function, arguments: args)
     }
     
@@ -370,6 +375,49 @@ public class Parser {
             return []
         }
         return args
+    }
+    
+    func parseArrayLiteral() -> Expression {
+        let token = curToken
+        let list = parseExpressionList(end: TokenType.RBRACKET)
+        return ArrayLiteral(token: token, elements: list)
+    }
+    
+    func parseExpressionList(end: TokenType) -> [Expression] {
+        var list:[Expression] = []
+        if isPeekTokenType(type: end) {
+            nextToken()
+            return list
+        }
+        nextToken()
+        if let ex = parseExpression(precedence: OperatorOrder.LOWEST) {
+            list.append(ex)
+        }
+        
+        while isPeekTokenType(type: TokenType.COMMA) {
+            nextToken()
+            nextToken()
+            if let ex = parseExpression(precedence: OperatorOrder.LOWEST) {
+                list.append(ex)
+            }
+        }
+        
+        if expectPeek(type: end) == false {
+            return []
+        }
+        return list
+
+    }
+    
+    
+    func parseIndexExpression(left: Expression) -> Expression {
+        let token = curToken
+        nextToken()
+        guard let index = parseExpression(precedence: OperatorOrder.LOWEST) else { return InvalidExpression() }
+        if expectPeek(type: TokenType.RBRACKET) == false {
+            return InvalidExpression()
+        }
+        return IndexExpression(token: token, left: left, index: index)
     }
 
 }

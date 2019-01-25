@@ -68,6 +68,8 @@ public class Lexer {
             case "\"":
                 let lit = readString()
                 return Token(tokenType: TokenType.STRING, literal: lit)
+            case "[": tok = Token(tokenType: TokenType.LBRACKET, literal: String(ch))
+            case "]": tok = Token(tokenType: TokenType.RBRACKET, literal: String(ch))
             default:
                 if isLetter(char:ch) {
                     let lit = readIdentifier()

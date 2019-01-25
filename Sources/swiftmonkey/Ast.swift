@@ -303,3 +303,42 @@ struct StringLiteral: Expression {
         return token.literal
     }
 }
+
+
+struct ArrayLiteral: Expression {
+    var token:Token
+    var elements: [Expression]
+    func expressionNode() {
+    }
+    
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+    
+    func string() -> String {
+        var result = ""
+        var elem:[String] = []
+        for e in elements {
+            elem.append(e.string())
+        }
+        let joinEle = elem.joined(separator: ", ")
+        result += "[\(joinEle)]"
+        return result
+    }
+}
+
+struct IndexExpression: Expression {
+    var token:Token
+    var left:Expression
+    var index:Expression
+    func expressionNode() {
+    }
+    
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+    
+    func string() -> String {
+        return "(\(left.string())[\(index.string())])"
+    }
+}

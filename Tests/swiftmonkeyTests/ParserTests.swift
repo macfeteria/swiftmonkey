@@ -269,6 +269,8 @@ class ParserTests: XCTestCase {
         (code: "add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", expected: "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"),
         (code: "add(a + b + c * d / f + g)", expected: "add((((a + b) + ((c * d) / f)) + g))"),
 
+        (code: "a * [1, 2, 3, 4][b * c] * d", expected: "((a * ([1, 2, 3, 4][(b * c)])) * d)"),
+        (code: "add(a * b[2], b[1], 2 * [1, 2][1])", expected: "add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))"),
         ]
 
         for test in tests {
@@ -417,4 +419,48 @@ class ParserTests: XCTestCase {
         validateInfix(infix: param2, left: 4, op: "+", right: 5)
     }
     
+    
+    func testArrayLiteralParsing() {
+        let code = "[1, 2 * 2, 3 + 3]"
+        
+        let lexer = Lexer(input: code)
+        let parser = Parser(lexer: lexer)
+        
+        let program = parser.parseProgram()
+        validateParserError(parser: parser)
+        
+        let statement = program.statements[0] as! ExpressionStatement
+        let array = statement.expression as! ArrayLiteral
+        XCTAssertTrue(array.elements.count == 3)
+
+        let intElement = array.elements[0] as! IntegerLiteral
+        validateInteger(integerLiteral: intElement, result: 1)
+        
+        let ele1 = array.elements[1] as! InfixExpression
+        let ele2 = array.elements[2] as! InfixExpression
+        
+        validateInfix(infix: ele1, left: 2, op: "*", right: 2)
+        validateInfix(infix: ele2, left: 3, op: "+", right: 3)
+    }
+    
+    func testParsingIndexExpressions() {
+        let code = "myArray[1 + 1]"
+        
+        let lexer = Lexer(input: code)
+        let parser = Parser(lexer: lexer)
+        
+        let program = parser.parseProgram()
+        validateParserError(parser: parser)
+        XCTAssertTrue(program.statements.count == 1)
+        
+        let statement = program.statements[0] as! ExpressionStatement
+        let expression = statement.expression as! IndexExpression
+        
+        let arrayIden = expression.left as! Identifier
+        validateIdentifier(identifier: arrayIden, result: "myArray")
+        
+        let index = expression.index as! InfixExpression
+        validateInfix(infix: index, left: 1, op: "+", right: 1)
+
+    }
 }

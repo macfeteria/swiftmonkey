@@ -31,6 +31,9 @@ public enum TokenType:String {
     case LBRACE = "{"
     case RBRACE = "}"
     
+    case LBRACKET = "["
+    case RBRACKET = "]"
+    
     // Keywords
     case FUNCTION = "FUNCTION"
     case LET      = "LET"
@@ -40,6 +43,7 @@ public enum TokenType:String {
     case ELSE     = "ELSE"
     case RETURN   = "RETURN"
     case STRING   = "STRING"
+    
 }
 
 public struct Token {

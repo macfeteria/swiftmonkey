@@ -172,6 +172,9 @@ class EvaluatorTests: XCTestCase {
                 }
                 """, expectedValue:"unknow operator: BOOLEAN + BOOLEAN"),
             (code:"foobar", expectedValue:"identifier not found: foobar"),
+            (code:"""
+                "Hello" - "World!"
+                """, expectedValue:"unknow operator: STRING - STRING"),
         ]
         for test in tests {
             let resultObj = evaluate(input: test.code)
@@ -235,5 +238,49 @@ class EvaluatorTests: XCTestCase {
         let resultObj = evaluate(input: code)
         validateStringObject(obj: resultObj, expect: "Hello")
     }
+
+    
+    func testStringConcatenation() {
+        let code = "\"Hello\" + \" \" + \"World!\""
+        let resultObj = evaluate(input: code)
+        validateStringObject(obj: resultObj, expect: "Hello World!")
+    }
+
+    func testArrayLiteral() {
+        let code = "[1, 2 * 2, 3 + 3]"
+        let resultObj = evaluate(input: code)
+        let arrayObj = resultObj as! ArrayObj
+        XCTAssertTrue(arrayObj.elements.count == 3)
+        validateIntegerObject(obj: arrayObj.elements[0], expect: 1)
+        validateIntegerObject(obj: arrayObj.elements[1], expect: 4)
+        validateIntegerObject(obj: arrayObj.elements[2], expect: 6)
+    }
+    
+    func testArrayIndexExpression() {
+        let tests = [
+            (code:"[1, 2, 3][0]", expectedValue: 1),
+            (code:"[1, 2, 3][1]", expectedValue: 2),
+            (code:"[1, 2, 3][2]", expectedValue: 3),
+            (code:"let i = 0; [1][i];", expectedValue: 1),
+            (code:"[1, 2, 3][1 + 1];", expectedValue: 3),
+            (code:"let myArray = [1, 2, 3]; myArray[2];", expectedValue: 3),
+            (code:"let myArray = [1, 2, 3]; myArray[0] + myArray[1] + myArray[2];", expectedValue: 6),
+            (code:"let myArray = [1, 2, 3]; let i = myArray[0]; myArray[i]", expectedValue: 2),
+            ]
+        for test in tests {
+            let resultObj = evaluate(input: test.code)
+            validateIntegerObject(obj: resultObj, expect: test.expectedValue)
+        }
+    }
+
+    func testArrayIndexExpressionNull() {
+        let tests = ["[1, 2, 3][3]", "[1, 2, 3][-1]",]
+        for test in tests {
+            let resultObj = evaluate(input: test)
+            validateNullObject(obj: resultObj)
+        }
+    }
+
+
 
 }

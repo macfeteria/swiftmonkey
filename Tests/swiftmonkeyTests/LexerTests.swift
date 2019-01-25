@@ -217,6 +217,28 @@ class LexerTests: XCTestCase {
             XCTAssert(tok.literal == i.literal, "Failed Literal: \(tok.literal)")
         }
     }
+    
+    func testArray() {
+        let code = """
+            [1, 2];
+            """
+        
+        let expectResult = [
+            Token(tokenType: TokenType.LBRACKET, literal: "["),
+            Token(tokenType: TokenType.INT, literal: "1"),
+            Token(tokenType: TokenType.COMMA, literal: ","),
+            Token(tokenType: TokenType.INT, literal: "2"),
+            Token(tokenType: TokenType.RBRACKET, literal: "]"),
+            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
+            ]
+        
+        let lexer = Lexer(input: code)
+        for i in expectResult {
+            let tok = lexer.nextToken()
+            XCTAssert(tok.tokenType == i.tokenType, "Failed Type: \(tok.tokenType.rawValue )")
+            XCTAssert(tok.literal == i.literal, "Failed Literal: \(tok.literal)")
+        }
+    }
 
     
 }

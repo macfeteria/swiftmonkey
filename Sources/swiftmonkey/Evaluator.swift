@@ -73,9 +73,27 @@ public struct Evaluator {
                 return args[0]
             }
             return applyFunction(fn: function, args: args)
+        case is ArrayLiteral:
+            let array = node as! ArrayLiteral
+            let elements = evalExpression(args:array.elements , environment: env)
+            if elements.count == 1 && isError(obj: elements[0]) {
+                return elements[0]
+            }
+            return ArrayObj(elements: elements)
         case is StringLiteral:
             let str = node as! StringLiteral
             return StringObj(value: str.value)
+        case is IndexExpression:
+            let indexEx = node as! IndexExpression
+            let left = eval(node: indexEx.left, environment: env)
+            if isError(obj: left) {
+                return left
+            }
+            let index = eval(node: indexEx.index, environment: env)
+            if isError(obj: index) {
+                return index
+            }
+            return evalIndexExpression(object: left, index: index)
         default:
             return Evaluator.NULL
         }
@@ -158,6 +176,9 @@ public struct Evaluator {
         if left.type() == ObjectType.INTEGER && right.type() == ObjectType.INTEGER {
             return evalIntegerExpression(oper: oper, left: left, right: right)
         }
+        if left.type() == ObjectType.STRING && right.type() == ObjectType.STRING {
+            return evalStringExpression(oper: oper, left: left, right: right)
+        }
 
         if left.type() == ObjectType.BOOLEAN && right.type() == ObjectType.BOOLEAN {
             let leftBool = left as! BooleanObj
@@ -188,6 +209,15 @@ public struct Evaluator {
         }
     }
 
+    func evalStringExpression(oper: String, left:Object, right: Object) -> Object {
+        let leftValue = (left as! StringObj).value
+        let rightValue = (right as! StringObj).value
+        if oper != "+" {
+            return ErrorObj(message: "unknow operator: \(left.type()) \(oper) \(right.type())")
+        }
+        return StringObj(value: leftValue + rightValue)
+    }
+    
     func evalIntegerExpression(oper: String, left:Object, right: Object) -> Object {
         let leftValue = (left as! IntegerObj).value
         let rightValue = (right as! IntegerObj).value
@@ -244,6 +274,18 @@ public struct Evaluator {
         }
     }
     
+    func evalIndexExpression(object: Object, index: Object) -> Object {
+        if let array = object as? ArrayObj, let idx = index as? IntegerObj {
+            if idx.value >= array.elements.count || idx.value < 0 {
+                return Evaluator.NULL
+            }
+            return array.elements[idx.value]
+        }
+        return ErrorObj(message: "index operator not supported: \(object.type())")
+    }
+
+    
+    
     func isTruthy(obj: Object) -> Bool {
         if obj is NullObj {
             return false
@@ -260,4 +302,5 @@ public struct Evaluator {
     func isError(obj: Object) -> Bool {
         return obj.type() == ObjectType.ERROR
     }
+    
 }

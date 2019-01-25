@@ -15,6 +15,7 @@ public enum ObjectType {
     case ERROR
     case FUNCTION
     case STRING
+    case ARRAY
 }
 
 public protocol Object {
@@ -110,5 +111,19 @@ struct StringObj:Object {
     
     func inspect() -> String {
         return value
+    }
+}
+
+struct ArrayObj:Object {
+    var elements:[Object]
+    func type() -> ObjectType {
+        return ObjectType.ARRAY
+    }
+    
+    func inspect() -> String {
+        let allElements = elements.map { (ele) -> String in
+            return ele.inspect()
+            }.joined(separator: ",")
+        return "[\(allElements)]"
     }
 }
