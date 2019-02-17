@@ -7,6 +7,7 @@
 
 import Foundation
 
+
 public struct Evaluator {
     static let TRUE = BooleanObj(value: true)
     static let FALSE = BooleanObj(value: false)
@@ -104,10 +105,19 @@ public struct Evaluator {
     }
     
     func applyFunction(fn: Object, args: [Object]) -> Object {
-        if let function = fn as? FunctionObj {
-            let extendedEnv = extendedFunctionEnv(fn: function, args: args)
-            let evaluated = eval(node: function.body, environment: extendedEnv)
-            return unwrapReturnValue(obj: evaluated)
+        switch fn.type() {
+        case ObjectType.FUNCTION :
+            if let function = fn as? FunctionObj {
+                let extendedEnv = extendedFunctionEnv(fn: function, args: args)
+                let evaluated = eval(node: function.body, environment: extendedEnv)
+                return unwrapReturnValue(obj: evaluated)
+            }
+        case ObjectType.BUILTIN:
+            if let builtin = fn as? BuiltinObj {
+                return builtin.fn(args)
+            }
+        default:
+             return ErrorObj(message:"not a function: \(fn.type())")
         }
         return ErrorObj(message:"not a function: \(fn.type())")
     }
@@ -143,10 +153,14 @@ public struct Evaluator {
     
     func evalIdentifier(node: Identifier, environment env: Environment) -> Object {
         let (iden,ok) = env.get(name: node.value)
-        if !ok {
-            return ErrorObj(message: "identifier not found: \(node.value)")
+        if ok {
+            return iden
         }
-        return iden
+        
+        if let builtin = builtins[node.value] {
+            return builtin
+        }
+        return ErrorObj(message: "identifier not found: \(node.value)")
     }
     
     func eval(program:Program, environment env: Environment) -> Object {

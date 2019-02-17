@@ -357,4 +357,47 @@ class EvaluatorTests: XCTestCase {
             validateNullObject(obj: resultObj)
         }
     }
+    
+    func testBuiltinFunctions () {
+        let tests = [
+            (code:"""
+                len("")
+            """, expectedValue: 0),
+            (code:"""
+                len("four")
+            """, expectedValue: 4),
+            (code:"""
+                len("hello world")
+            """, expectedValue: 11),
+            (code:"""
+                len([1, 2, 3])
+            """, expectedValue: 3),
+            (code:"""
+                len(["one", "two", "three"])
+            """, expectedValue: 3),
+            (code:"""
+                len({"one": 1, "two": 2, "three": 3})
+            """, expectedValue: 3),
+            ]
+        for test in tests {
+            let resultObj = evaluate(input: test.code)
+            validateIntegerObject(obj: resultObj, expect: test.expectedValue)
+        }
+    }
+    
+    func testBuiltinFunctionsError () {
+        let tests = [
+            (code:"""
+                len(1)
+            """, expectedValue: "argument to `len` not supported, got INTEGER"),
+            (code:"""
+                len("one", "two")
+            """, expectedValue: "wrong number of arguments. got=2, want=1"),
+            ]
+        for test in tests {
+            let resultObj = evaluate(input: test.code)
+            XCTAssertTrue(resultObj.inspect() == test.expectedValue, "Expect \(test.expectedValue) Got \(resultObj.inspect())" )
+        }
+    }
+
 }

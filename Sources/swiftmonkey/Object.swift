@@ -17,6 +17,7 @@ public enum ObjectType {
     case STRING
     case ARRAY
     case HASH
+    case BUILTIN
 }
 
 public protocol Object {
@@ -27,6 +28,8 @@ public protocol Object {
 protocol ObjectHashable {
     func hashKey() -> HashKey
 }
+
+typealias BuildinFunction = ([Object]) -> Object
 
 struct IntegerObj:Object, ObjectHashable {
     var value:Int
@@ -162,4 +165,15 @@ struct HashObj:Object {
         return "{\(allElements)}"
     }
 
+}
+
+struct BuiltinObj:Object {
+    var fn:BuildinFunction
+    func type() -> ObjectType {
+        return ObjectType.BUILTIN
+    }
+    
+    func inspect() -> String {
+        return "buildin function"
+    }
 }

@@ -27,6 +27,7 @@
 		D772149021DCB627007BAA3B /* Repl.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772148F21DCB627007BAA3B /* Repl.swift */; };
 		D772149221DDFB3F007BAA3B /* Ast.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772149121DDFB3F007BAA3B /* Ast.swift */; };
 		D772149421DDFE0D007BAA3B /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772149321DDFE0D007BAA3B /* Parser.swift */; };
+		D79EC4CB2219541C0066AA26 /* Builtin.swift in Sources */ = {isa = PBXBuildFile; fileRef = D79EC4CA2219541C0066AA26 /* Builtin.swift */; };
 		D7B356C321D91C6600DC0CB2 /* Lexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B356C221D91C6600DC0CB2 /* Lexer.swift */; };
 		D7B356C521D920B100DC0CB2 /* LexerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B356C421D920B100DC0CB2 /* LexerTests.swift */; };
 		D7E3A04921E73272006D19CE /* Object.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E3A04821E73272006D19CE /* Object.swift */; };
@@ -71,6 +72,7 @@
 		D772148F21DCB627007BAA3B /* Repl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Repl.swift; sourceTree = "<group>"; };
 		D772149121DDFB3F007BAA3B /* Ast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ast.swift; sourceTree = "<group>"; };
 		D772149321DDFE0D007BAA3B /* Parser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
+		D79EC4CA2219541C0066AA26 /* Builtin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builtin.swift; sourceTree = "<group>"; };
 		D7B356C221D91C6600DC0CB2 /* Lexer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lexer.swift; sourceTree = "<group>"; };
 		D7B356C421D920B100DC0CB2 /* LexerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexerTests.swift; sourceTree = "<group>"; };
 		D7E3A04821E73272006D19CE /* Object.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Object.swift; sourceTree = "<group>"; };
@@ -123,6 +125,7 @@
 				D7E3A04821E73272006D19CE /* Object.swift */,
 				D7E3A04A21E73831006D19CE /* Evaluator.swift */,
 				D76CF05421EDCA0A00D00C83 /* Environment.swift */,
+				D79EC4CA2219541C0066AA26 /* Builtin.swift */,
 			);
 			name = swiftmonkey;
 			path = Sources/swiftmonkey;
@@ -289,6 +292,7 @@
 			buildActionMask = 0;
 			files = (
 				D772149221DDFB3F007BAA3B /* Ast.swift in Sources */,
+				D79EC4CB2219541C0066AA26 /* Builtin.swift in Sources */,
 				D76CF05521EDCA0A00D00C83 /* Environment.swift in Sources */,
 				D7E3A04B21E73831006D19CE /* Evaluator.swift in Sources */,
 				D772149021DCB627007BAA3B /* Repl.swift in Sources */,
