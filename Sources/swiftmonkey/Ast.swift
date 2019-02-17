@@ -20,6 +20,17 @@ public protocol Expression: Node {
     func expressionNode() -> Void
 }
 
+extension Expression {
+    public static func == (lhs: Expression, rhs: Expression) -> Bool {
+        return lhs.string() == rhs.string()
+    }
+    
+    var hashValue: Int {
+        return string().hashValue
+    }
+}
+
+
 public struct Program: Node  {
     public var statements = [Statement]()
     public func tokenLiteral() -> String {
@@ -340,5 +351,37 @@ struct IndexExpression: Expression {
     
     func string() -> String {
         return "(\(left.string())[\(index.string())])"
+    }
+}
+
+struct HashLiteral: Expression {
+    struct ExpressionKey:Hashable {
+        static func == (lhs: HashLiteral.ExpressionKey, rhs: HashLiteral.ExpressionKey) -> Bool {
+            return lhs.hashValue == rhs.hashValue
+        }
+        
+        var expression:Expression
+        var hashValue:Int
+    }
+    
+    var token:Token
+    var pairs:[ExpressionKey:Expression]
+    func expressionNode() {
+    }
+    
+    func tokenLiteral() -> String {
+        return token.literal
+    }
+    
+    func string() -> String {
+        var result = ""
+        var elem:[String] = []
+
+        for (key,value) in pairs {
+            elem.append("\(key):\(value.string())")
+        }
+        let joinEle = elem.joined(separator: ", ")
+        result += "{\(joinEle)}"
+        return result
     }
 }

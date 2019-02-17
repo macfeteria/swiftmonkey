@@ -16,6 +16,7 @@ public enum ObjectType {
     case FUNCTION
     case STRING
     case ARRAY
+    case HASH
 }
 
 public protocol Object {
@@ -23,7 +24,11 @@ public protocol Object {
     func inspect() -> String
 }
 
-struct IntegerObj:Object {
+protocol ObjectHashable {
+    func hashKey() -> HashKey
+}
+
+struct IntegerObj:Object, ObjectHashable {
     var value:Int
     func type() -> ObjectType {
         return ObjectType.INTEGER
@@ -32,9 +37,12 @@ struct IntegerObj:Object {
     func inspect() -> String {
         return "\(value)"
     }
+    func hashKey() -> HashKey {
+        return HashKey(type: ObjectType.INTEGER, hashValue: value.hashValue)
+    }
 }
 
-struct BooleanObj:Object, Equatable {
+struct BooleanObj:Object, ObjectHashable {
     var value:Bool
     func type() -> ObjectType {
         return ObjectType.BOOLEAN
@@ -43,8 +51,9 @@ struct BooleanObj:Object, Equatable {
     func inspect() -> String {
         return "\(value)"
     }
-    static func == (lhs: BooleanObj, rhs: BooleanObj) -> Bool {
-        return lhs.value == rhs.value
+
+    func hashKey() -> HashKey {
+        return HashKey(type: ObjectType.BOOLEAN, hashValue: value.hashValue)
     }
 }
 
@@ -102,8 +111,7 @@ struct FunctionObj:Object {
     }
 }
 
-
-struct StringObj:Object {
+struct StringObj:Object, ObjectHashable {
     var value:String
     func type() -> ObjectType {
         return ObjectType.STRING
@@ -111,6 +119,10 @@ struct StringObj:Object {
     
     func inspect() -> String {
         return value
+    }
+    
+    func hashKey() -> HashKey {
+        return HashKey(type: ObjectType.STRING, hashValue: value.hashValue)
     }
 }
 
@@ -126,4 +138,28 @@ struct ArrayObj:Object {
             }.joined(separator: ",")
         return "[\(allElements)]"
     }
+}
+
+struct HashKey: Hashable {
+    var type:ObjectType
+    var hashValue: Int
+}
+
+struct HashPair {
+    var key: Object
+    var value: Object
+}
+
+struct HashObj:Object {
+    var pairs:[HashKey:HashPair]
+    func type() -> ObjectType {
+        return ObjectType.HASH
+    }
+    func inspect() -> String {
+        let allElements = pairs.map { (_,ele) -> String in
+            return "\(ele.key.inspect()):\(ele.value.inspect())"
+            }.joined(separator: ",")
+        return "{\(allElements)}"
+    }
+
 }

@@ -34,6 +34,8 @@ public enum TokenType:String {
     case LBRACKET = "["
     case RBRACKET = "]"
     
+    case COLON = ":"
+    
     // Keywords
     case FUNCTION = "FUNCTION"
     case LET      = "LET"

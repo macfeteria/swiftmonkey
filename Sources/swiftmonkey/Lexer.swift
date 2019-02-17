@@ -70,6 +70,7 @@ public class Lexer {
                 return Token(tokenType: TokenType.STRING, literal: lit)
             case "[": tok = Token(tokenType: TokenType.LBRACKET, literal: String(ch))
             case "]": tok = Token(tokenType: TokenType.RBRACKET, literal: String(ch))
+            case ":": tok = Token(tokenType: TokenType.COLON, literal: String(ch))
             default:
                 if isLetter(char:ch) {
                     let lit = readIdentifier()

@@ -77,6 +77,8 @@ public class Parser {
 
         registerPrefix(type: TokenType.LBRACKET, function: parseArrayLiteral)
         
+        registerPrefix(type: TokenType.LBRACE, function: parseHashLiteral)
+        
         registerInfix(type: TokenType.PLUS, function: parseInfixExpression)
         registerInfix(type: TokenType.MINUS, function: parseInfixExpression)
         registerInfix(type: TokenType.SLASH, function: parseInfixExpression)
@@ -418,6 +420,29 @@ public class Parser {
             return InvalidExpression()
         }
         return IndexExpression(token: token, left: left, index: index)
+    }
+    
+    func parseHashLiteral() -> Expression {
+        var hash = HashLiteral(token: curToken , pairs: [:])
+        
+        while isPeekTokenType(type: TokenType.RBRACE) == false {
+            nextToken()
+            let key = parseExpression(precedence: OperatorOrder.LOWEST)!
+            if expectPeek(type: TokenType.COLON) == false {
+                return InvalidExpression()
+            }
+            nextToken()
+            let value =  parseExpression(precedence: OperatorOrder.LOWEST)!
+            let expKey = HashLiteral.ExpressionKey(expression: key, hashValue: key.string().hashValue)
+            hash.pairs[expKey] = value
+            if isPeekTokenType(type: TokenType.RBRACE) == false && expectPeek(type: TokenType.COMMA) == false {
+                return InvalidExpression()
+            }
+        }
+        if expectPeek(type: TokenType.RBRACE) == false {
+            return InvalidExpression()
+        }
+        return hash
     }
 
 }

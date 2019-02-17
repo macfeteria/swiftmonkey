@@ -175,6 +175,9 @@ class EvaluatorTests: XCTestCase {
             (code:"""
                 "Hello" - "World!"
                 """, expectedValue:"unknow operator: STRING - STRING"),
+            (code:"""
+                {"name": "Monkey"}[fn(x) { x }];
+                """, expectedValue:"unusable as hash key: FUNCTION"),
         ]
         for test in tests {
             let resultObj = evaluate(input: test.code)
@@ -281,6 +284,77 @@ class EvaluatorTests: XCTestCase {
         }
     }
 
+    func testHashLiterals() {
+        let code = """
+            let two = "two";
+            {   "one": 10 - 9,
+                two: 1 + 1,
+                "thr" + "ee": 6 / 2,
+                4 : 4,
+                true: 5,
+                false: 6
+            }
+        """
+        
+        let resultObj = evaluate(input: code)
+        let hashobj = resultObj as! HashObj
+
+        let one = hashobj.pairs[HashKey(type: ObjectType.STRING, hashValue: "one".hashValue)]!.value
+        let two = hashobj.pairs[HashKey(type: ObjectType.STRING, hashValue: "two".hashValue)]!.value
+        let three = hashobj.pairs[HashKey(type: ObjectType.STRING, hashValue: "three".hashValue)]!.value
+        let four = hashobj.pairs[HashKey(type: ObjectType.INTEGER, hashValue: 4.hashValue)]!.value
+        let five = hashobj.pairs[HashKey(type: ObjectType.BOOLEAN, hashValue: true.hashValue)]!.value
+        let six = hashobj.pairs[HashKey(type: ObjectType.BOOLEAN, hashValue: false.hashValue)]!.value
+
+        validateIntegerObject(obj: one, expect: 1)
+        validateIntegerObject(obj: two, expect: 2)
+        validateIntegerObject(obj: three, expect: 3)
+        validateIntegerObject(obj: four, expect: 4)
+        validateIntegerObject(obj: five, expect: 5)
+        validateIntegerObject(obj: six, expect: 6)
+    }
 
 
+    func testHashExpression() {
+        let tests = [
+            (code:"""
+                {"foo":5}["foo"]
+                """,expectedValue: 5),
+            (code:"""
+                let key = "foo";
+                {"foo":5}[key]
+                """,expectedValue: 5),
+            (code:"""
+                {5:5}[5]
+                """,
+             expectedValue: 5),
+            (code:"""
+                {true:5}[true]
+                """,
+             expectedValue: 5),
+            (code:"""
+                {false:5}[false]
+                """,
+             expectedValue: 5),
+            ]
+        for test in tests {
+            let resultObj = evaluate(input: test.code)
+            let intResult = resultObj as! IntegerObj
+            validateIntegerObject(obj: intResult, expect: test.expectedValue)
+        }
+    }
+
+    func testHashNull () {
+        let tests = ["""
+                {}["foo"]
+                """,
+                """
+                {"foo":5}["bar"]
+                """,
+        ]
+        for test in tests {
+            let resultObj = evaluate(input: test)
+            validateNullObject(obj: resultObj)
+        }
+    }
 }

@@ -94,6 +94,9 @@ public struct Evaluator {
                 return index
             }
             return evalIndexExpression(object: left, index: index)
+        case is HashLiteral:
+            let hash = node as! HashLiteral
+            return evalHashLiteral(hash: hash, environment: env)
         default:
             return Evaluator.NULL
         }
@@ -281,9 +284,37 @@ public struct Evaluator {
             }
             return array.elements[idx.value]
         }
+        if let hash = object as? HashObj {
+            if let key = index as? ObjectHashable {
+                if let item = hash.pairs[key.hashKey()] {
+                    return item.value
+                }
+                return Evaluator.NULL
+            }
+            return ErrorObj(message: "unusable as hash key: \(index.type())")
+        }
         return ErrorObj(message: "index operator not supported: \(object.type())")
     }
 
+    func evalHashLiteral(hash: HashLiteral, environment env: Environment) -> Object {
+        var pairs:[HashKey: HashPair] = [:]
+        for (keyNode, valueNode) in hash.pairs {
+            let key = eval(node: keyNode.expression, environment: env)
+            if isError(obj: key) {
+               return key
+            }
+            let value = eval(node: valueNode, environment: env)
+            if isError(obj: value) {
+                return value
+            }
+            
+            if key is ObjectHashable {
+                let keyObject = (key as! ObjectHashable).hashKey()
+                pairs[keyObject] = HashPair(key: key, value: value)
+            }
+        }
+        return HashObj(pairs: pairs)
+    }
     
     
     func isTruthy(obj: Object) -> Bool {

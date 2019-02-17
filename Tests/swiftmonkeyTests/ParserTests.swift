@@ -463,4 +463,74 @@ class ParserTests: XCTestCase {
         validateInfix(infix: index, left: 1, op: "+", right: 1)
 
     }
+    
+    
+    
+    func testParsingHashLiteralsStringKeys() {
+        let code = """
+            {"one": 1, "two": 2, "three": 3}
+        """
+        
+        let lexer = Lexer(input: code)
+        let parser = Parser(lexer: lexer)
+        
+        let program = parser.parseProgram()
+        validateParserError(parser: parser)
+        XCTAssertTrue(program.statements.count == 1)
+        
+        let statement = program.statements[0] as! ExpressionStatement
+        let hash = statement.expression as! HashLiteral
+        
+        XCTAssertTrue(hash.pairs.count == 3)
+        
+        let expected = ["one": 1, "two": 2, "three": 3]
+        for (key, value) in hash.pairs {
+            let expectedValue = expected[key.expression.string()]
+            validateInteger(integerLiteral: value as! IntegerLiteral, result: expectedValue!)
+        }
+    }
+
+    func testParsingEmptyHashLiteral() {
+        let code = "{}"
+        
+        let lexer = Lexer(input: code)
+        let parser = Parser(lexer: lexer)
+        
+        let program = parser.parseProgram()
+        validateParserError(parser: parser)
+        XCTAssertTrue(program.statements.count == 1)
+        
+        let statement = program.statements[0] as! ExpressionStatement
+        let hash = statement.expression as! HashLiteral
+        
+        XCTAssertTrue(hash.pairs.count == 0)
+    }
+    
+    func testParsingHashLiteralsWithExpression() {
+        let code = """
+            {"one": 0 + 1, "two": 10 - 8, "three": 15 / 5}
+        """
+        
+        let lexer = Lexer(input: code)
+        let parser = Parser(lexer: lexer)
+        
+        let program = parser.parseProgram()
+        validateParserError(parser: parser)
+        XCTAssertTrue(program.statements.count == 1)
+        
+        let statement = program.statements[0] as! ExpressionStatement
+        let hash = statement.expression as! HashLiteral
+        
+        XCTAssertTrue(hash.pairs.count == 3)
+        
+        let expected = ["one": (left: 0, op: "+" , right: 1),
+                        "two": (left: 10, op: "-" , right: 8),
+                        "three": (left: 15, op: "/" , right: 5)]
+        for (key, value) in hash.pairs {
+            let expect = expected[key.expression.string()]!
+            let resultValue = value as! InfixExpression
+            validateInfix(infix: resultValue, left: expect.left, op: expect.op, right: expect.right)
+        }
+    }
+
 }

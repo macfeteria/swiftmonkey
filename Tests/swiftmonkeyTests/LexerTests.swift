@@ -240,5 +240,26 @@ class LexerTests: XCTestCase {
         }
     }
 
+    func testHash() {
+        let code = """
+            {"foo" : "bar"}
+            """
+        
+        let expectResult = [
+            Token(tokenType: TokenType.LBRACE, literal: "{"),
+            Token(tokenType: TokenType.STRING, literal: "foo"),
+            Token(tokenType: TokenType.COLON, literal: ":"),
+            Token(tokenType: TokenType.STRING, literal: "bar"),
+            Token(tokenType: TokenType.RBRACE, literal: "}"),
+            ]
+        
+        let lexer = Lexer(input: code)
+        for i in expectResult {
+            let tok = lexer.nextToken()
+            XCTAssert(tok.tokenType == i.tokenType, "Failed Type: \(tok.tokenType.rawValue )")
+            XCTAssert(tok.literal == i.literal, "Failed Literal: \(tok.literal)")
+        }
+    }
+
     
 }
