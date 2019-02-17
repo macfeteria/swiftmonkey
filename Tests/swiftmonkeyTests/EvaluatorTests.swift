@@ -385,6 +385,27 @@ class EvaluatorTests: XCTestCase {
         }
     }
     
+    func testBuiltinFunctionsArray () {
+        let tests = [
+            (code:"""
+                first(["one", "two", "three"])
+            """, expectedValue: "one"),
+            (code:"""
+                last(["one", "two", "three"])
+            """, expectedValue: "three"),
+            (code:"""
+                first(["single"])
+            """, expectedValue: "single"),
+            (code:"""
+                last(["single"])
+            """, expectedValue: "single"),
+            ]
+        for test in tests {
+            let resultObj = evaluate(input: test.code)
+            validateStringObject(obj: resultObj, expect: test.expectedValue)
+        }
+    }
+    
     func testBuiltinFunctionsError () {
         let tests = [
             (code:"""
@@ -393,10 +414,29 @@ class EvaluatorTests: XCTestCase {
             (code:"""
                 len("one", "two")
             """, expectedValue: "wrong number of arguments. got=2, want=1"),
+            (code:"""
+                first("element")
+            """, expectedValue: "argument to `first` must be array, got STRING"),
+            (code:"""
+                last("element")
+            """, expectedValue: "argument to `last` must be array, got STRING"),
             ]
         for test in tests {
             let resultObj = evaluate(input: test.code)
             XCTAssertTrue(resultObj.inspect() == test.expectedValue, "Expect \(test.expectedValue) Got \(resultObj.inspect())" )
+        }
+    }
+    
+    func testBuiltinFunctionNull () {
+        let tests = ["""
+                first([])
+            """,
+            """
+                last([])
+            """]
+        for test in tests {
+            let resultObj = evaluate(input: test)
+            validateNullObject(obj: resultObj)
         }
     }
 
