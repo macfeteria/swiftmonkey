@@ -54,4 +54,33 @@ let builtins = [
         }
         return Evaluator.NULL
     }),
+    "rest": BuiltinObj(fn: {(args: [Object]) -> Object in
+        if args.count != 1 {
+            return ErrorObj(message: "wrong number of arguments. got=\(args.count), want=1")
+        }
+        if args[0].type() !=  ObjectType.ARRAY {
+            return ErrorObj(message: "argument to `rest` must be array, got \(args[0].type())")
+        }
+        let arrObj = args[0] as! ArrayObj
+        let count =  arrObj.elements.count
+        if count > 0 {
+            let lastIndex = arrObj.elements.count
+            let newElement = Array(arrObj.elements[1..<lastIndex])
+            return ArrayObj(elements: newElement)
+        }
+        return Evaluator.NULL
+    }),
+    "push": BuiltinObj(fn: {(args: [Object]) -> Object in
+        if args.count != 2 {
+            return ErrorObj(message: "wrong number of arguments. got=\(args.count), want=2")
+        }
+        if args[0].type() !=  ObjectType.ARRAY {
+            return ErrorObj(message: "argument to `push` must be array, got \(args[0].type())")
+        }
+        let arrObj = args[0] as! ArrayObj
+        let count =  arrObj.elements.count
+        var newElement = arrObj.elements
+        newElement.append(args[1])
+        return ArrayObj(elements: newElement)
+    }),
 ]

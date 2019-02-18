@@ -433,11 +433,39 @@ class EvaluatorTests: XCTestCase {
             """,
             """
                 last([])
-            """]
+            """,
+            """
+                rest([])
+            """,
+            ]
         for test in tests {
             let resultObj = evaluate(input: test)
             validateNullObject(obj: resultObj)
         }
+    }
+    
+    func testBuiltinFunctionsArrayRestPush () {
+        let code = """
+                rest(["one", "two", "three"])
+            """
+        let resultObj = evaluate(input: code)
+        let arrayObj = resultObj as! ArrayObj
+        XCTAssertTrue(arrayObj.elements.count == 2)
+        validateStringObject(obj: arrayObj.elements[0], expect: "two")
+        validateStringObject(obj: arrayObj.elements[1], expect: "three")
+    }
+    
+    func testBuiltinFunctionsArrayPush () {
+        let code = """
+                push([1,2,3], 4)
+            """
+        let resultObj = evaluate(input: code)
+        let arrayObj = resultObj as! ArrayObj
+        XCTAssertTrue(arrayObj.elements.count == 4)
+        validateIntegerObject(obj: arrayObj.elements[0], expect: 1)
+        validateIntegerObject(obj: arrayObj.elements[1], expect: 2)
+        validateIntegerObject(obj: arrayObj.elements[2], expect: 3)
+        validateIntegerObject(obj: arrayObj.elements[3], expect: 4)
     }
 
 }
