@@ -83,4 +83,10 @@ let builtins = [
         newElement.append(args[1])
         return ArrayObj(elements: newElement)
     }),
+    "puts": BuiltinObj(fn: {(args: [Object]) -> Object in
+        for arg in args {
+            print(arg.inspect())
+        }
+        return Evaluator.NULL
+    }),
 ]
