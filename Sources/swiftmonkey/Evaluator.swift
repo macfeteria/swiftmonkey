@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 public struct Evaluator {
     static let TRUE = BooleanObj(value: true)
     static let FALSE = BooleanObj(value: false)

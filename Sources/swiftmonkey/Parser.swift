@@ -41,7 +41,7 @@ public class Parser {
     var infixParseFunctions:[TokenType:infixParseFn] = [:]
     var peekPercedence: OperatorOrder {
         get {
-            if let percedence = precedences[peekToken.tokenType] {
+            if let percedence = precedences[peekToken.type] {
                 return percedence
             }
             return OperatorOrder.LOWEST
@@ -49,7 +49,7 @@ public class Parser {
     }
     var curPercedence: OperatorOrder {
         get {
-            if let percedence = precedences[curToken.tokenType] {
+            if let percedence = precedences[curToken.type] {
                 return percedence
             }
             return OperatorOrder.LOWEST
@@ -101,7 +101,7 @@ public class Parser {
     public func parseProgram() -> Program {
         var program = Program()
         
-        while curToken.tokenType != TokenType.EOF {
+        while curToken.type != TokenType.EOF {
             if let stmt = parseStatement() {
                 program.statements.append(stmt)
             }
@@ -111,7 +111,7 @@ public class Parser {
     }
     
     func parseStatement() -> Statement? {
-        switch curToken.tokenType {
+        switch curToken.type {
         case .LET:
             return parseLetStatement()
         case .RETURN:
@@ -124,7 +124,7 @@ public class Parser {
     func parseExpressStatement() -> ExpressionStatement {
         var statement = ExpressionStatement(token: curToken, expression: nil)
         statement.expression = parseExpression(precedence: OperatorOrder.LOWEST)
-        if isPeekTokenType(type: TokenType.SEMICOLON) {
+        if peekToken(type: TokenType.SEMICOLON) {
             nextToken()
         }
         return statement
@@ -135,7 +135,7 @@ public class Parser {
         nextToken()
         
         let returnValue = parseExpression(precedence: OperatorOrder.LOWEST)
-        while isPeekTokenType(type: TokenType.SEMICOLON){
+        while peekToken(type: TokenType.SEMICOLON){
             nextToken()
         }
 
@@ -144,35 +144,35 @@ public class Parser {
     
     func parseLetStatement() -> LetStatement? {
         let token = curToken
-        if expectPeek(type: TokenType.IDENT) == false {
+        if expectPeekToken(type: TokenType.IDENT) == false {
             return nil
         }
         
         let name = Identifier(token: curToken, value: curToken.literal)
-        if expectPeek(type: TokenType.ASSIGN) == false {
+        if expectPeekToken(type: TokenType.ASSIGN) == false {
             return nil
         }
         
         nextToken()
         let expression = parseExpression(precedence: OperatorOrder.LOWEST)
         
-        while isPeekTokenType(type: TokenType.SEMICOLON) {
+        while peekToken(type: TokenType.SEMICOLON) {
             nextToken()
         }
         
         return LetStatement(token: token, name: name, value: expression)
     }
     
-    func isCurrentTokenType(type: TokenType) -> Bool {
-       return curToken.tokenType == type
+    func currentToken(type: TokenType) -> Bool {
+       return curToken.type == type
     }
 
-    func isPeekTokenType(type: TokenType) -> Bool {
-        return peekToken.tokenType == type
+    func peekToken(type: TokenType) -> Bool {
+        return peekToken.type == type
     }
     
-    func expectPeek(type: TokenType) -> Bool {
-        if isPeekTokenType(type: type) {
+    func expectPeekToken(type: TokenType) -> Bool {
+        if peekToken(type: type) {
             nextToken()
             return true
         } else {
@@ -183,7 +183,7 @@ public class Parser {
     
     func peekError(type: TokenType) {
         let error = "expected next token to be "
-            + peekToken.tokenType.rawValue
+            + peekToken.type.rawValue
             + ", got " + type.rawValue + " instead."
         errors.append(error)
     }
@@ -197,13 +197,13 @@ public class Parser {
     }
     
     func parseExpression(precedence: OperatorOrder) -> Expression? {
-        guard let prefix = prefixParseFunctions[curToken.tokenType] else {
-            noPrefixParseFunctionError(tokenType: curToken.tokenType)
+        guard let prefix = prefixParseFunctions[curToken.type] else {
+            noPrefixParseFunctionError(type: curToken.type)
             return nil
         }
         var leftExp = prefix()
-        while ( isPeekTokenType(type: TokenType.SEMICOLON) == false && precedence.rawValue < peekPercedence.rawValue) {
-            let infix = infixParseFunctions[peekToken.tokenType]
+        while ( peekToken(type: TokenType.SEMICOLON) == false && precedence.rawValue < peekPercedence.rawValue) {
+            let infix = infixParseFunctions[peekToken.type]
             if infix == nil {
                 return leftExp
             }
@@ -218,7 +218,7 @@ public class Parser {
     }
     
     func parseBoolean() -> Expression {
-        return Boolean(token: curToken, value: isCurrentTokenType(type: TokenType.TRUE))
+        return Boolean(token: curToken, value: currentToken(type: TokenType.TRUE))
     }
     
     func parseStringLiteral() -> Expression {
@@ -257,8 +257,8 @@ public class Parser {
     }
 
     
-    func noPrefixParseFunctionError(tokenType: TokenType){
-        let message = "no prefix parse function for \(tokenType.rawValue) found"
+    func noPrefixParseFunctionError(type: TokenType){
+        let message = "no prefix parse function for \(type.rawValue) found"
         errors.append(message)
     }
     
@@ -266,7 +266,7 @@ public class Parser {
         nextToken()
 
         let exp = parseExpression(precedence: OperatorOrder.LOWEST)
-        if expectPeek(type: TokenType.RPAREN) == false {
+        if expectPeekToken(type: TokenType.RPAREN) == false {
             return InvalidExpression()
         }
 
@@ -276,8 +276,8 @@ public class Parser {
     func parseBlockStatement() -> BlockStatement {
         var block = BlockStatement(token:curToken, statements: [])
         nextToken()
-        while isCurrentTokenType(type: TokenType.RBRACE) == false
-            && isCurrentTokenType(type: TokenType.EOF) == false
+        while currentToken(type: TokenType.RBRACE) == false
+            && currentToken(type: TokenType.EOF) == false
         {
             if let stmt = parseStatement() {
                 block.statements.append(stmt)
@@ -289,20 +289,20 @@ public class Parser {
     
     func parseIfExpression() -> Expression {
         let token = curToken
-        if expectPeek(type: TokenType.LPAREN) == false {
+        if expectPeekToken(type: TokenType.LPAREN) == false {
             return InvalidExpression()
         }
         nextToken()
         guard let condition = parseExpression(precedence: OperatorOrder.LOWEST) else { return InvalidExpression() }
-        if !expectPeek(type: TokenType.RPAREN) { return InvalidExpression() }
-        if !expectPeek(type: TokenType.LBRACE) { return InvalidExpression() }
+        if !expectPeekToken(type: TokenType.RPAREN) { return InvalidExpression() }
+        if !expectPeekToken(type: TokenType.LBRACE) { return InvalidExpression() }
 
         let consequence = parseBlockStatement()
         var alter:BlockStatement?
         
-        if isPeekTokenType(type: TokenType.ELSE) {
+        if peekToken(type: TokenType.ELSE) {
             nextToken()
-            if !expectPeek(type: TokenType.LBRACE) {
+            if !expectPeekToken(type: TokenType.LBRACE) {
                 return InvalidExpression()
             }
             alter = parseBlockStatement()
@@ -314,11 +314,11 @@ public class Parser {
     
     func parseFunctionLiteral() -> Expression {
         let token = curToken
-        if expectPeek(type: TokenType.LPAREN) == false {
+        if expectPeekToken(type: TokenType.LPAREN) == false {
             return InvalidExpression()
         }
         let param = parseFunctionParameters()
-        if expectPeek(type: TokenType.LBRACE) == false {
+        if expectPeekToken(type: TokenType.LBRACE) == false {
             return InvalidExpression()
         }
         let body = parseBlockStatement()
@@ -327,7 +327,7 @@ public class Parser {
     
     func parseFunctionParameters() -> [Identifier] {
         var identfiers:[Identifier] = []
-        if isPeekTokenType(type: TokenType.RPAREN) {
+        if peekToken(type: TokenType.RPAREN) {
             nextToken()
             return identfiers
         }
@@ -335,14 +335,14 @@ public class Parser {
         let ident = Identifier(token: curToken, value: curToken.literal)
         identfiers.append(ident)
         
-        while isPeekTokenType(type: TokenType.COMMA) {
+        while peekToken(type: TokenType.COMMA) {
             nextToken()
             nextToken()
             let idenParam = Identifier(token: curToken, value: curToken.literal)
             identfiers.append(idenParam)
         }
         
-        if expectPeek(type: TokenType.RPAREN) == false {
+        if expectPeekToken(type: TokenType.RPAREN) == false {
             return []
         }
         return identfiers
@@ -356,7 +356,7 @@ public class Parser {
     
     func parseCallArguments() -> [Expression] {
         var args:[Expression] = []
-        if isPeekTokenType(type: TokenType.RPAREN) {
+        if peekToken(type: TokenType.RPAREN) {
             nextToken()
             return args
         }
@@ -365,7 +365,7 @@ public class Parser {
             args.append(ex)
         }
         
-        while isPeekTokenType(type: TokenType.COMMA) {
+        while peekToken(type: TokenType.COMMA) {
             nextToken()
             nextToken()
             if let ex = parseExpression(precedence: OperatorOrder.LOWEST) {
@@ -373,7 +373,7 @@ public class Parser {
             }
         }
         
-        if expectPeek(type: TokenType.RPAREN) == false {
+        if expectPeekToken(type: TokenType.RPAREN) == false {
             return []
         }
         return args
@@ -387,7 +387,7 @@ public class Parser {
     
     func parseExpressionList(end: TokenType) -> [Expression] {
         var list:[Expression] = []
-        if isPeekTokenType(type: end) {
+        if peekToken(type: end) {
             nextToken()
             return list
         }
@@ -396,7 +396,7 @@ public class Parser {
             list.append(ex)
         }
         
-        while isPeekTokenType(type: TokenType.COMMA) {
+        while peekToken(type: TokenType.COMMA) {
             nextToken()
             nextToken()
             if let ex = parseExpression(precedence: OperatorOrder.LOWEST) {
@@ -404,19 +404,17 @@ public class Parser {
             }
         }
         
-        if expectPeek(type: end) == false {
+        if expectPeekToken(type: end) == false {
             return []
         }
         return list
-
     }
-    
     
     func parseIndexExpression(left: Expression) -> Expression {
         let token = curToken
         nextToken()
         guard let index = parseExpression(precedence: OperatorOrder.LOWEST) else { return InvalidExpression() }
-        if expectPeek(type: TokenType.RBRACKET) == false {
+        if expectPeekToken(type: TokenType.RBRACKET) == false {
             return InvalidExpression()
         }
         return IndexExpression(token: token, left: left, index: index)
@@ -425,21 +423,21 @@ public class Parser {
     func parseHashLiteral() -> Expression {
         var hash = HashLiteral(token: curToken , pairs: [:])
         
-        while isPeekTokenType(type: TokenType.RBRACE) == false {
+        while peekToken(type: TokenType.RBRACE) == false {
             nextToken()
             let key = parseExpression(precedence: OperatorOrder.LOWEST)!
-            if expectPeek(type: TokenType.COLON) == false {
+            if expectPeekToken(type: TokenType.COLON) == false {
                 return InvalidExpression()
             }
             nextToken()
             let value =  parseExpression(precedence: OperatorOrder.LOWEST)!
             let expKey = HashLiteral.ExpressionKey(expression: key, hashValue: key.string().hashValue)
             hash.pairs[expKey] = value
-            if isPeekTokenType(type: TokenType.RBRACE) == false && expectPeek(type: TokenType.COMMA) == false {
+            if peekToken(type: TokenType.RBRACE) == false && expectPeekToken(type: TokenType.COMMA) == false {
                 return InvalidExpression()
             }
         }
-        if expectPeek(type: TokenType.RBRACE) == false {
+        if expectPeekToken(type: TokenType.RBRACE) == false {
             return InvalidExpression()
         }
         return hash

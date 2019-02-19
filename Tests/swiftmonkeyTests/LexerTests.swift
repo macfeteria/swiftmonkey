@@ -16,34 +16,37 @@ class LexerTests: XCTestCase {
     override func tearDown() {
     }
     
+    func validateToken(expect:Token, result: Token) {
+        XCTAssert(result.type == expect.type, "Failed Type: \(result.type.rawValue )")
+        XCTAssert(result.literal == expect.literal, "Failed Literal: \(result.literal)")
+    }
+    
     func testEmptyCode() {
         let code = ""
-        let expectResult = Token(tokenType: TokenType.EOF, literal: "\0")
+        let expect = Token(type: TokenType.EOF, literal: "\0")
         let lexer = Lexer(input: code)
-        let tok = lexer.nextToken()
+        let result = lexer.nextToken()
 
-        XCTAssert(tok.tokenType == expectResult.tokenType, "Failed Type: \(tok.tokenType.rawValue )")
-        XCTAssert(tok.literal == expectResult.literal, "Failed Literal: \(tok.literal)")
+        validateToken(expect: expect, result: result)
     }
 
     func testNextToken() {
         let code = "=+(){},;"
         let expectResult = [
-            Token(tokenType: TokenType.ASSIGN, literal: "="),
-            Token(tokenType: TokenType.PLUS, literal: "+"),
-            Token(tokenType: TokenType.LPAREN, literal: "("),
-            Token(tokenType: TokenType.RPAREN, literal: ")"),
-            Token(tokenType: TokenType.LBRACE, literal: "{"),
-            Token(tokenType: TokenType.RBRACE, literal: "}"),
-            Token(tokenType: TokenType.COMMA, literal: ","),
-            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
+            Token(type: TokenType.ASSIGN, literal: "="),
+            Token(type: TokenType.PLUS, literal: "+"),
+            Token(type: TokenType.LPAREN, literal: "("),
+            Token(type: TokenType.RPAREN, literal: ")"),
+            Token(type: TokenType.LBRACE, literal: "{"),
+            Token(type: TokenType.RBRACE, literal: "}"),
+            Token(type: TokenType.COMMA, literal: ","),
+            Token(type: TokenType.SEMICOLON, literal: ";"),
         ]
 
         let lexer = Lexer(input: code)
-        for i in expectResult {
-            let tok = lexer.nextToken()
-            XCTAssert(tok.tokenType == i.tokenType, "Failed Type: \(tok.tokenType.rawValue )")
-            XCTAssert(tok.literal == i.literal, "Failed Literal: \(tok.literal)")
+        for expect in expectResult {
+            let result = lexer.nextToken()
+            validateToken(expect: expect, result: result)
         }
     }
     
@@ -53,15 +56,14 @@ class LexerTests: XCTestCase {
         "foo bar"
         """
         let expectResult = [
-            Token(tokenType: TokenType.STRING, literal: "foobar"),
-            Token(tokenType: TokenType.STRING, literal: "foo bar"),
+            Token(type: TokenType.STRING, literal: "foobar"),
+            Token(type: TokenType.STRING, literal: "foo bar"),
             ]
         
         let lexer = Lexer(input: code)
-        for i in expectResult {
-            let tok = lexer.nextToken()
-            XCTAssert(tok.tokenType == i.tokenType, "Failed Type: \(tok.tokenType.rawValue )")
-            XCTAssert(tok.literal == i.literal, "Failed Literal: \(tok.literal)")
+        for expect in expectResult {
+            let result = lexer.nextToken()
+            validateToken(expect: expect, result: result)
         }
     }
     
@@ -77,54 +79,53 @@ class LexerTests: XCTestCase {
 
         let expectResult = [
 
-            Token(tokenType: TokenType.LET, literal: "let"),
-            Token(tokenType: TokenType.IDENT, literal: "five"),
-            Token(tokenType: TokenType.ASSIGN, literal: "="),
-            Token(tokenType: TokenType.INT, literal: "5"),
-            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
+            Token(type: TokenType.LET, literal: "let"),
+            Token(type: TokenType.IDENT, literal: "five"),
+            Token(type: TokenType.ASSIGN, literal: "="),
+            Token(type: TokenType.INT, literal: "5"),
+            Token(type: TokenType.SEMICOLON, literal: ";"),
             
-            Token(tokenType: TokenType.LET, literal: "let"),
-            Token(tokenType: TokenType.IDENT, literal: "ten"),
-            Token(tokenType: TokenType.ASSIGN, literal: "="),
-            Token(tokenType: TokenType.INT, literal: "10"),
-            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
+            Token(type: TokenType.LET, literal: "let"),
+            Token(type: TokenType.IDENT, literal: "ten"),
+            Token(type: TokenType.ASSIGN, literal: "="),
+            Token(type: TokenType.INT, literal: "10"),
+            Token(type: TokenType.SEMICOLON, literal: ";"),
             
-            Token(tokenType: TokenType.LET, literal: "let"),
-            Token(tokenType: TokenType.IDENT, literal: "add"),
-            Token(tokenType: TokenType.ASSIGN, literal: "="),
-            Token(tokenType: TokenType.FUNCTION, literal: "fn"),
-            Token(tokenType: TokenType.LPAREN, literal: "("),
-            Token(tokenType: TokenType.IDENT, literal: "x"),
-            Token(tokenType: TokenType.COMMA, literal: ","),
-            Token(tokenType: TokenType.IDENT, literal: "y"),
-            Token(tokenType: TokenType.RPAREN, literal: ")"),
-            Token(tokenType: TokenType.LBRACE, literal: "{"),
-            Token(tokenType: TokenType.IDENT, literal: "x"),
-            Token(tokenType: TokenType.PLUS, literal: "+"),
-            Token(tokenType: TokenType.IDENT, literal: "y"),
-            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
-            Token(tokenType: TokenType.RBRACE, literal: "}"),
-            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
+            Token(type: TokenType.LET, literal: "let"),
+            Token(type: TokenType.IDENT, literal: "add"),
+            Token(type: TokenType.ASSIGN, literal: "="),
+            Token(type: TokenType.FUNCTION, literal: "fn"),
+            Token(type: TokenType.LPAREN, literal: "("),
+            Token(type: TokenType.IDENT, literal: "x"),
+            Token(type: TokenType.COMMA, literal: ","),
+            Token(type: TokenType.IDENT, literal: "y"),
+            Token(type: TokenType.RPAREN, literal: ")"),
+            Token(type: TokenType.LBRACE, literal: "{"),
+            Token(type: TokenType.IDENT, literal: "x"),
+            Token(type: TokenType.PLUS, literal: "+"),
+            Token(type: TokenType.IDENT, literal: "y"),
+            Token(type: TokenType.SEMICOLON, literal: ";"),
+            Token(type: TokenType.RBRACE, literal: "}"),
+            Token(type: TokenType.SEMICOLON, literal: ";"),
             
-            Token(tokenType: TokenType.LET, literal: "let"),
-            Token(tokenType: TokenType.IDENT, literal: "result"),
-            Token(tokenType: TokenType.ASSIGN, literal: "="),
-            Token(tokenType: TokenType.IDENT, literal: "add"),
-            Token(tokenType: TokenType.LPAREN, literal: "("),
-            Token(tokenType: TokenType.IDENT, literal: "five"),
-            Token(tokenType: TokenType.COMMA, literal: ","),
-            Token(tokenType: TokenType.IDENT, literal: "ten"),
-            Token(tokenType: TokenType.RPAREN, literal: ")"),
-            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
+            Token(type: TokenType.LET, literal: "let"),
+            Token(type: TokenType.IDENT, literal: "result"),
+            Token(type: TokenType.ASSIGN, literal: "="),
+            Token(type: TokenType.IDENT, literal: "add"),
+            Token(type: TokenType.LPAREN, literal: "("),
+            Token(type: TokenType.IDENT, literal: "five"),
+            Token(type: TokenType.COMMA, literal: ","),
+            Token(type: TokenType.IDENT, literal: "ten"),
+            Token(type: TokenType.RPAREN, literal: ")"),
+            Token(type: TokenType.SEMICOLON, literal: ";"),
             
-            Token(tokenType: TokenType.EOF, literal: "\0"),
+            Token(type: TokenType.EOF, literal: "\0"),
         ]
         
         let lexer = Lexer(input: code)
-        for i in expectResult {
-            let tok = lexer.nextToken()
-            XCTAssert(tok.tokenType == i.tokenType, "Failed Type: \(tok.tokenType.rawValue )")
-            XCTAssert(tok.literal == i.literal, "Failed Literal: \(tok.literal)")
+        for expect in expectResult {
+            let result = lexer.nextToken()
+            validateToken(expect: expect, result: result)
         }
     }
     
@@ -134,26 +135,25 @@ class LexerTests: XCTestCase {
             5 < 10 > 5;
             """
         let expectResult = [
-            Token(tokenType: TokenType.BANG, literal: "!"),
-            Token(tokenType: TokenType.MINUS, literal: "-"),
-            Token(tokenType: TokenType.SLASH, literal: "/"),
-            Token(tokenType: TokenType.ASTERISK, literal: "*"),
-            Token(tokenType: TokenType.INT, literal: "5"),
-            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
+            Token(type: TokenType.BANG, literal: "!"),
+            Token(type: TokenType.MINUS, literal: "-"),
+            Token(type: TokenType.SLASH, literal: "/"),
+            Token(type: TokenType.ASTERISK, literal: "*"),
+            Token(type: TokenType.INT, literal: "5"),
+            Token(type: TokenType.SEMICOLON, literal: ";"),
 
-            Token(tokenType: TokenType.INT, literal: "5"),
-            Token(tokenType: TokenType.LESSTHAN, literal: "<"),
-            Token(tokenType: TokenType.INT, literal: "10"),
-            Token(tokenType: TokenType.GREATER, literal: ">"),
-            Token(tokenType: TokenType.INT, literal: "5"),
-            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
+            Token(type: TokenType.INT, literal: "5"),
+            Token(type: TokenType.LESSTHAN, literal: "<"),
+            Token(type: TokenType.INT, literal: "10"),
+            Token(type: TokenType.GREATER, literal: ">"),
+            Token(type: TokenType.INT, literal: "5"),
+            Token(type: TokenType.SEMICOLON, literal: ";"),
             ]
         
         let lexer = Lexer(input: code)
-        for i in expectResult {
-            let tok = lexer.nextToken()
-            XCTAssert(tok.tokenType == i.tokenType, "Failed Type: \(tok.tokenType.rawValue )")
-            XCTAssert(tok.literal == i.literal, "Failed Literal: \(tok.literal)")
+        for expect in expectResult {
+            let result = lexer.nextToken()
+            validateToken(expect: expect, result: result)
         }
     }
 
@@ -166,30 +166,29 @@ class LexerTests: XCTestCase {
             }
             """
         let expectResult = [
-            Token(tokenType: TokenType.IF, literal: "if"),
-            Token(tokenType: TokenType.LPAREN, literal: "("),
-            Token(tokenType: TokenType.INT, literal: "5"),
-            Token(tokenType: TokenType.LESSTHAN, literal: "<"),
-            Token(tokenType: TokenType.INT, literal: "10"),
-            Token(tokenType: TokenType.RPAREN, literal: ")"),
-            Token(tokenType: TokenType.LBRACE, literal: "{"),
-            Token(tokenType: TokenType.RETURN, literal: "return"),
-            Token(tokenType: TokenType.TRUE, literal: "true"),
-            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
-            Token(tokenType: TokenType.RBRACE, literal: "}"),
-            Token(tokenType: TokenType.ELSE, literal: "else"),
-            Token(tokenType: TokenType.LBRACE, literal: "{"),
-            Token(tokenType: TokenType.RETURN, literal: "return"),
-            Token(tokenType: TokenType.FALSE, literal: "false"),
-            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
-            Token(tokenType: TokenType.RBRACE, literal: "}"),
+            Token(type: TokenType.IF, literal: "if"),
+            Token(type: TokenType.LPAREN, literal: "("),
+            Token(type: TokenType.INT, literal: "5"),
+            Token(type: TokenType.LESSTHAN, literal: "<"),
+            Token(type: TokenType.INT, literal: "10"),
+            Token(type: TokenType.RPAREN, literal: ")"),
+            Token(type: TokenType.LBRACE, literal: "{"),
+            Token(type: TokenType.RETURN, literal: "return"),
+            Token(type: TokenType.TRUE, literal: "true"),
+            Token(type: TokenType.SEMICOLON, literal: ";"),
+            Token(type: TokenType.RBRACE, literal: "}"),
+            Token(type: TokenType.ELSE, literal: "else"),
+            Token(type: TokenType.LBRACE, literal: "{"),
+            Token(type: TokenType.RETURN, literal: "return"),
+            Token(type: TokenType.FALSE, literal: "false"),
+            Token(type: TokenType.SEMICOLON, literal: ";"),
+            Token(type: TokenType.RBRACE, literal: "}"),
             ]
         
         let lexer = Lexer(input: code)
-        for i in expectResult {
-            let tok = lexer.nextToken()
-            XCTAssert(tok.tokenType == i.tokenType, "Failed Type: \(tok.tokenType.rawValue )")
-            XCTAssert(tok.literal == i.literal, "Failed Literal: \(tok.literal)")
+        for expect in expectResult {
+            let result = lexer.nextToken()
+            validateToken(expect: expect, result: result)
         }
     }
 
@@ -199,22 +198,21 @@ class LexerTests: XCTestCase {
             10 != 9;
             """
         let expectResult = [
-            Token(tokenType: TokenType.INT, literal: "10"),
-            Token(tokenType: TokenType.EQUAL, literal: "=="),
-            Token(tokenType: TokenType.INT, literal: "10"),
-            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
+            Token(type: TokenType.INT, literal: "10"),
+            Token(type: TokenType.EQUAL, literal: "=="),
+            Token(type: TokenType.INT, literal: "10"),
+            Token(type: TokenType.SEMICOLON, literal: ";"),
 
-            Token(tokenType: TokenType.INT, literal: "10"),
-            Token(tokenType: TokenType.NOTEQUAL, literal: "!="),
-            Token(tokenType: TokenType.INT, literal: "9"),
-            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
+            Token(type: TokenType.INT, literal: "10"),
+            Token(type: TokenType.NOTEQUAL, literal: "!="),
+            Token(type: TokenType.INT, literal: "9"),
+            Token(type: TokenType.SEMICOLON, literal: ";"),
             ]
         
         let lexer = Lexer(input: code)
-        for i in expectResult {
-            let tok = lexer.nextToken()
-            XCTAssert(tok.tokenType == i.tokenType, "Failed Type: \(tok.tokenType.rawValue )")
-            XCTAssert(tok.literal == i.literal, "Failed Literal: \(tok.literal)")
+        for expect in expectResult {
+            let result = lexer.nextToken()
+            validateToken(expect: expect, result: result)
         }
     }
     
@@ -224,19 +222,18 @@ class LexerTests: XCTestCase {
             """
         
         let expectResult = [
-            Token(tokenType: TokenType.LBRACKET, literal: "["),
-            Token(tokenType: TokenType.INT, literal: "1"),
-            Token(tokenType: TokenType.COMMA, literal: ","),
-            Token(tokenType: TokenType.INT, literal: "2"),
-            Token(tokenType: TokenType.RBRACKET, literal: "]"),
-            Token(tokenType: TokenType.SEMICOLON, literal: ";"),
+            Token(type: TokenType.LBRACKET, literal: "["),
+            Token(type: TokenType.INT, literal: "1"),
+            Token(type: TokenType.COMMA, literal: ","),
+            Token(type: TokenType.INT, literal: "2"),
+            Token(type: TokenType.RBRACKET, literal: "]"),
+            Token(type: TokenType.SEMICOLON, literal: ";"),
             ]
         
         let lexer = Lexer(input: code)
-        for i in expectResult {
-            let tok = lexer.nextToken()
-            XCTAssert(tok.tokenType == i.tokenType, "Failed Type: \(tok.tokenType.rawValue )")
-            XCTAssert(tok.literal == i.literal, "Failed Literal: \(tok.literal)")
+        for expect in expectResult {
+            let result = lexer.nextToken()
+            validateToken(expect: expect, result: result)
         }
     }
 
@@ -246,18 +243,17 @@ class LexerTests: XCTestCase {
             """
         
         let expectResult = [
-            Token(tokenType: TokenType.LBRACE, literal: "{"),
-            Token(tokenType: TokenType.STRING, literal: "foo"),
-            Token(tokenType: TokenType.COLON, literal: ":"),
-            Token(tokenType: TokenType.STRING, literal: "bar"),
-            Token(tokenType: TokenType.RBRACE, literal: "}"),
+            Token(type: TokenType.LBRACE, literal: "{"),
+            Token(type: TokenType.STRING, literal: "foo"),
+            Token(type: TokenType.COLON, literal: ":"),
+            Token(type: TokenType.STRING, literal: "bar"),
+            Token(type: TokenType.RBRACE, literal: "}"),
             ]
         
         let lexer = Lexer(input: code)
-        for i in expectResult {
-            let tok = lexer.nextToken()
-            XCTAssert(tok.tokenType == i.tokenType, "Failed Type: \(tok.tokenType.rawValue )")
-            XCTAssert(tok.literal == i.literal, "Failed Literal: \(tok.literal)")
+        for expect in expectResult {
+            let result = lexer.nextToken()
+            validateToken(expect: expect, result: result)
         }
     }
 

@@ -18,33 +18,33 @@ class ParserTests: XCTestCase {
         if T.self is IntegerLiteral.Type {
             let identExpression = expression as! Identifier
             let resultString = result as! String
-            validateIdentifier(identifier: identExpression, result: resultString)
+            validateIdentifier(identifier: identExpression, expect: resultString)
         }
         if T.self is Identifier.Type {
             let integerExpression = expression as! IntegerLiteral
             let resultInt = result as! Int
-            validateInteger(integerLiteral: integerExpression, result: resultInt)
+            validateInteger(integerLiteral: integerExpression, expect: resultInt)
         }
         if T.self is Boolean.Type {
             let boolean = expression as! Boolean
             let resultBoolean = result as! Bool
-            validateBoolean(boolean: boolean, result: resultBoolean)
+            validateBoolean(boolean: boolean, expect: resultBoolean)
         }
     }
     
-    func validateInteger(integerLiteral: IntegerLiteral, result: Int ) {
-        XCTAssertTrue(integerLiteral.value == result, "Expect \(integerLiteral.value) Got \(result)")
-        XCTAssertTrue(integerLiteral.tokenLiteral() == "\(result)", "Expect \(integerLiteral.tokenLiteral()) Got \(result)")
+    func validateInteger(integerLiteral: IntegerLiteral, expect: Int ) {
+        XCTAssertTrue(integerLiteral.value == expect, "Expect \(expect) Got \(integerLiteral.value)")
+        XCTAssertTrue(integerLiteral.tokenLiteral() == "\(expect)", "Expect \(expect) Got \(integerLiteral.tokenLiteral())")
     }
     
-    func validateIdentifier(identifier: Identifier, result: String ) {
-        XCTAssertTrue(identifier.value == result, "Expect \(identifier.value) Got \(result)")
-        XCTAssertTrue(identifier.tokenLiteral() == result, "Expect \(identifier.tokenLiteral()) Got \(result)")
+    func validateIdentifier(identifier: Identifier, expect: String ) {
+        XCTAssertTrue(identifier.value == expect, "Expect \(expect) Got \(identifier.value)")
+        XCTAssertTrue(identifier.tokenLiteral() == expect, "Expect \(expect) Got \(identifier.tokenLiteral())")
     }
     
-    func validateBoolean(boolean: Boolean, result: Bool) {
-        XCTAssertTrue(boolean.value == result)
-        XCTAssertTrue(boolean.tokenLiteral() == String(result), "Expect \(boolean.tokenLiteral()) Got \(result)")
+    func validateBoolean(boolean: Boolean, expect: Bool) {
+        XCTAssertTrue(boolean.value == expect)
+        XCTAssertTrue(boolean.tokenLiteral() == String(expect), "Expect \(expect) Got \(boolean.tokenLiteral())")
     }
 
     func validateInfix<T>(infix: InfixExpression, left: T, op: String, right: T) {
@@ -85,9 +85,7 @@ class ParserTests: XCTestCase {
             validateParserError(parser: parser)
             
             let letStatement = program.statements[0] as! LetStatement
-            XCTAssertTrue(letStatement.name.tokenLiteral() == test.expectedIdentifier, "Expect \(test.expectedIdentifier) Got \(letStatement.name.tokenLiteral())")
-            XCTAssertTrue(letStatement.name.value  == test.expectedIdentifier, "Expect \(test.expectedIdentifier) Got \(letStatement.name.value)")
-            
+            validateIdentifier(identifier: letStatement.name, expect:test.expectedIdentifier)
             validateLiteralExpression(expression: letStatement.value, result: test.expectedValue)
         }
         
@@ -175,8 +173,7 @@ class ParserTests: XCTestCase {
             XCTAssertTrue(expression.operatorLiteral == test.oper)
 
             let integerLit = expression.right as! IntegerLiteral
-            XCTAssertTrue(integerLit.value == test.intValue, "Expect \(test.intValue) Got \(integerLit.value)")
-            XCTAssertTrue(integerLit.tokenLiteral() == "\(test.intValue)", "Expect \(test.intValue) Got \(integerLit.tokenLiteral())")
+            validateInteger(integerLiteral: integerLit, expect: test.intValue)
         }
     }
 
@@ -198,8 +195,7 @@ class ParserTests: XCTestCase {
             XCTAssertTrue(expression.operatorLiteral == test.oper)
             
             let boolLit = expression.right as! Boolean
-            XCTAssertTrue(boolLit.value == test.value, "Expect \(test.value) Got \(boolLit.value)")
-            XCTAssertTrue(boolLit.tokenLiteral() == "\(test.value)", "Expect \(test.value) Got \(boolLit.tokenLiteral())")
+            validateBoolean(boolean: boolLit, expect: test.value)
         }
     }
 
@@ -236,10 +232,8 @@ class ParserTests: XCTestCase {
             
             let statement = program.statements[0] as! ExpressionStatement
             validateInfix(statement: statement, left: test.leftValue, op: test.oper, right: test.rightValue)
-
         }
     }
-
     
     func testOperatorPrecedenceParsing() {
         let tests = [(code: "-a * b", expected: "((-a) * b)"),
@@ -284,7 +278,6 @@ class ParserTests: XCTestCase {
         }
     }
     
-    
     func testBooleanExpression() {
         let code = "true;"
         
@@ -296,7 +289,6 @@ class ParserTests: XCTestCase {
 
         XCTAssertTrue(program.statements.count == 1)
 
-        
         let statement = program.statements[0] as! ExpressionStatement
         validateLiteralExpression(expression: statement.expression!, result: true)
     }
@@ -336,7 +328,6 @@ class ParserTests: XCTestCase {
         
         let consequence = ifExp.consequence.statements[0] as! ExpressionStatement
         validateLiteralExpression(expression: consequence.expression, result: "x")
-
        
         XCTAssertNotNil(ifExp.alternative)
         let alter = ifExp.alternative!
@@ -360,8 +351,8 @@ class ParserTests: XCTestCase {
         let function = statement.expression as! FunctionLiteral
         XCTAssertTrue(function.parameters.count == 2)
         
-        validateIdentifier(identifier: function.parameters[0], result: "x")
-        validateIdentifier(identifier: function.parameters[1], result: "y")
+        validateIdentifier(identifier: function.parameters[0], expect: "x")
+        validateIdentifier(identifier: function.parameters[1], expect: "y")
         
         XCTAssertTrue(function.body.statements.count == 1)
         let body = function.body.statements[0] as! ExpressionStatement
@@ -387,7 +378,7 @@ class ParserTests: XCTestCase {
             XCTAssertTrue(function.parameters.count == test.expected.count)
             
             for i in 0 ..< function.parameters.count {
-                validateIdentifier(identifier: function.parameters[i], result: test.expected[i])
+                validateIdentifier(identifier: function.parameters[i], expect: test.expected[i])
             }
         }
     }
@@ -406,7 +397,7 @@ class ParserTests: XCTestCase {
         let expression = statement.expression as! CallExpression
         
         let functionIden = expression.function as! Identifier
-        validateIdentifier(identifier: functionIden, result: "add")
+        validateIdentifier(identifier: functionIden, expect: "add")
 
         XCTAssertTrue(expression.arguments.count == 3)
         
@@ -434,7 +425,7 @@ class ParserTests: XCTestCase {
         XCTAssertTrue(array.elements.count == 3)
 
         let intElement = array.elements[0] as! IntegerLiteral
-        validateInteger(integerLiteral: intElement, result: 1)
+        validateInteger(integerLiteral: intElement, expect: 1)
         
         let ele1 = array.elements[1] as! InfixExpression
         let ele2 = array.elements[2] as! InfixExpression
@@ -457,14 +448,12 @@ class ParserTests: XCTestCase {
         let expression = statement.expression as! IndexExpression
         
         let arrayIden = expression.left as! Identifier
-        validateIdentifier(identifier: arrayIden, result: "myArray")
+        validateIdentifier(identifier: arrayIden, expect: "myArray")
         
         let index = expression.index as! InfixExpression
         validateInfix(infix: index, left: 1, op: "+", right: 1)
 
     }
-    
-    
     
     func testParsingHashLiteralsStringKeys() {
         let code = """
@@ -486,7 +475,7 @@ class ParserTests: XCTestCase {
         let expected = ["one": 1, "two": 2, "three": 3]
         for (key, value) in hash.pairs {
             let expectedValue = expected[key.expression.string()]
-            validateInteger(integerLiteral: value as! IntegerLiteral, result: expectedValue!)
+            validateInteger(integerLiteral: value as! IntegerLiteral, expect: expectedValue!)
         }
     }
 
@@ -532,5 +521,4 @@ class ParserTests: XCTestCase {
             validateInfix(infix: resultValue, left: expect.left, op: expect.op, right: expect.right)
         }
     }
-
 }

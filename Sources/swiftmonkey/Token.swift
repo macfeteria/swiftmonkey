@@ -49,7 +49,7 @@ public enum TokenType:String {
 }
 
 public struct Token {
-    var tokenType:TokenType
+    var `type`:TokenType
     var literal:String
 }
 

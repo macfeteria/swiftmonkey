@@ -12,9 +12,9 @@ class AstTests: XCTestCase {
 
     func testPerformanceExample() {
         let program = Program(statements: [
-            LetStatement(token: Token(tokenType: TokenType.LET, literal: "let"),
-                         name: Identifier(token: Token(tokenType: TokenType.IDENT, literal: "myVar"), value: "myVar"),
-                         value: Identifier(token: Token(tokenType: TokenType.IDENT, literal: "anotherVar"), value: "anotherVar"))
+            LetStatement(token: Token(type: TokenType.LET, literal: "let"),
+                         name: Identifier(token: Token(type: TokenType.IDENT, literal: "myVar"), value: "myVar"),
+                         value: Identifier(token: Token(type: TokenType.IDENT, literal: "anotherVar"), value: "anotherVar"))
             ])
         
         let expectedResult = "let myVar = anotherVar;"

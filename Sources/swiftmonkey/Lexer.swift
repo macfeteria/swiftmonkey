@@ -38,49 +38,49 @@ public class Lexer {
                 if peekChar() == "=" {
                     let curent = ch
                     readChar()
-                    tok = Token(tokenType: TokenType.EQUAL, literal: String("\(curent)\(ch)"))
+                    tok = Token(type: TokenType.EQUAL, literal: String("\(curent)\(ch)"))
                 } else {
-                    tok = Token(tokenType: TokenType.ASSIGN, literal: String(ch))
+                    tok = Token(type: TokenType.ASSIGN, literal: String(ch))
                 }
-            case ";": tok = Token(tokenType: TokenType.SEMICOLON, literal: String(ch))
-            case "(": tok = Token(tokenType: TokenType.LPAREN, literal: String(ch))
-            case ")": tok = Token(tokenType: TokenType.RPAREN, literal: String(ch))
-            case ",": tok = Token(tokenType: TokenType.COMMA, literal: String(ch))
+            case ";": tok = Token(type: TokenType.SEMICOLON, literal: String(ch))
+            case "(": tok = Token(type: TokenType.LPAREN, literal: String(ch))
+            case ")": tok = Token(type: TokenType.RPAREN, literal: String(ch))
+            case ",": tok = Token(type: TokenType.COMMA, literal: String(ch))
 
-            case "+": tok = Token(tokenType: TokenType.PLUS, literal: String(ch))
-            case "-": tok = Token(tokenType: TokenType.MINUS, literal: String(ch))
-            case "/": tok = Token(tokenType: TokenType.SLASH, literal: String(ch))
-            case "*": tok = Token(tokenType: TokenType.ASTERISK, literal: String(ch))
+            case "+": tok = Token(type: TokenType.PLUS, literal: String(ch))
+            case "-": tok = Token(type: TokenType.MINUS, literal: String(ch))
+            case "/": tok = Token(type: TokenType.SLASH, literal: String(ch))
+            case "*": tok = Token(type: TokenType.ASTERISK, literal: String(ch))
             case "!":
                 if peekChar() == "=" {
                     let curent = ch
                     readChar()
-                    tok = Token(tokenType: TokenType.NOTEQUAL, literal: String("\(curent)\(ch)"))
+                    tok = Token(type: TokenType.NOTEQUAL, literal: String("\(curent)\(ch)"))
                 } else {
-                    tok = Token(tokenType: TokenType.BANG, literal: String(ch))
+                    tok = Token(type: TokenType.BANG, literal: String(ch))
                 }
-            case "<": tok = Token(tokenType: TokenType.LESSTHAN, literal: String(ch))
-            case ">": tok = Token(tokenType: TokenType.GREATER, literal: String(ch))
+            case "<": tok = Token(type: TokenType.LESSTHAN, literal: String(ch))
+            case ">": tok = Token(type: TokenType.GREATER, literal: String(ch))
 
-            case "{": tok = Token(tokenType: TokenType.LBRACE, literal: String(ch))
-            case "}": tok = Token(tokenType: TokenType.RBRACE, literal: String(ch))
-            case "\0": tok = Token(tokenType: TokenType.EOF, literal: String(ch))
+            case "{": tok = Token(type: TokenType.LBRACE, literal: String(ch))
+            case "}": tok = Token(type: TokenType.RBRACE, literal: String(ch))
+            case "\0": tok = Token(type: TokenType.EOF, literal: String(ch))
             case "\"":
                 let lit = readString()
-                return Token(tokenType: TokenType.STRING, literal: lit)
-            case "[": tok = Token(tokenType: TokenType.LBRACKET, literal: String(ch))
-            case "]": tok = Token(tokenType: TokenType.RBRACKET, literal: String(ch))
-            case ":": tok = Token(tokenType: TokenType.COLON, literal: String(ch))
+                return Token(type: TokenType.STRING, literal: lit)
+            case "[": tok = Token(type: TokenType.LBRACKET, literal: String(ch))
+            case "]": tok = Token(type: TokenType.RBRACKET, literal: String(ch))
+            case ":": tok = Token(type: TokenType.COLON, literal: String(ch))
             default:
                 if isLetter(char:ch) {
                     let lit = readIdentifier()
                     let type = lookupIdent(ident: lit)
-                    return Token(tokenType: type, literal: lit)
+                    return Token(type: type, literal: lit)
                 } else if isDigit(char:ch) {
                     let lit = readNumber()
-                    return Token(tokenType: TokenType.INT, literal: lit)
+                    return Token(type: TokenType.INT, literal: lit)
                 } else {
-                    return Token(tokenType: TokenType.ILLEGAL, literal: String(ch))
+                    return Token(type: TokenType.ILLEGAL, literal: String(ch))
                 }
         }
         readChar()

@@ -37,7 +37,6 @@
 		OBJ_32 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* main.swift */; };
 		OBJ_34 /* swiftmonkey.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "swiftmonkey::swiftmonkey::Product" /* swiftmonkey.framework */; };
 		OBJ_41 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_6 /* Package.swift */; };
-		OBJ_52 /* XCTestManifests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_14 /* XCTestManifests.swift */; };
 		OBJ_55 /* swiftmonkey.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "swiftmonkey::swiftmonkey::Product" /* swiftmonkey.framework */; };
 /* End PBXBuildFile section */
 
@@ -79,7 +78,6 @@
 		D7E3A04A21E73831006D19CE /* Evaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Evaluator.swift; sourceTree = "<group>"; };
 		D7E3A04C21E7414D006D19CE /* EvaluatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvaluatorTests.swift; sourceTree = "<group>"; };
 		OBJ_11 /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
-		OBJ_14 /* XCTestManifests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTestManifests.swift; sourceTree = "<group>"; };
 		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		OBJ_9 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		"swiftmonkey::swiftmonkey::Product" /* swiftmonkey.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = swiftmonkey.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -142,7 +140,6 @@
 		OBJ_13 /* swiftmonkeyTests */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_14 /* XCTestManifests.swift */,
 				D7B356C421D920B100DC0CB2 /* LexerTests.swift */,
 				D758037521DE0EAD00CB65F6 /* ParserTests.swift */,
 				D758037721DF5C6800CB65F6 /* AstTests.swift */,
@@ -324,7 +321,6 @@
 			buildActionMask = 0;
 			files = (
 				D758037821DF5C6800CB65F6 /* AstTests.swift in Sources */,
-				OBJ_52 /* XCTestManifests.swift in Sources */,
 				D7B356C521D920B100DC0CB2 /* LexerTests.swift in Sources */,
 				D758037621DE0EAD00CB65F6 /* ParserTests.swift in Sources */,
 				D7E3A04D21E7414D006D19CE /* EvaluatorTests.swift in Sources */,
